@@ -55,8 +55,23 @@ make run HOST=0.0.0.0 PORT=8080
 - Separate the sections more clearly
 - Fix the footer styling
 - Make the skills section look really cool
-- Fix the links so they all have uniform hovering
+- Fix the links so they all have uniform hovering (make the hovers super cool)
 - Add SEO and AI discovery improvements
 - Create a sitemap
 - Set up deployment for Heroku
 - create and add a decent favicon (your initials are fine ZS)
+
+
+## Skills to Write about:
+HTML
+CSS
+JavaScript
+PHP
+Symfony (Twig)
+AI
+Vibe Coding
+Git
+Version Control
+SEO Optimization
+AEO Optimization
+Social Media Management
