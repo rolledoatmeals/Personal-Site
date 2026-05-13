@@ -216,6 +216,10 @@ section {
 	justify-content: space-between;
 }
 
+/* subtle nav polish */
+.site-nav { padding: 0.35rem 0; }
+.logo-mark { box-shadow: 0 6px 18px rgba(0,0,0,.35); padding: .5rem .65rem }
+
 .logo {
 	color: var(--white);
 	font-weight: 700;
@@ -342,6 +346,14 @@ section {
 .hero-inner{display:flex;align-items:flex-start;justify-content:space-between;gap:2rem;padding:6rem 0}
 .hero-left{max-width:720px}
 
+/* Hero polish */
+.hero { background: linear-gradient(180deg, rgba(10,15,30,1) 0%, rgba(6,10,20,1) 60%); }
+.hero-title{font-size:clamp(2.4rem,6vw,5rem);letter-spacing:-0.02em}
+.hero-sub{color:var(--muted);opacity:.9;margin-top:1rem;font-size:1.05rem}
+.hero .hero-links { margin-top:1.25rem }
+
+.hero-left .social-link svg { filter: drop-shadow(0 6px 12px rgba(0,0,0,.45)); }
+
 /* alternating section backgrounds */
 .section--dark{background:var(--bg)}
 .section--alt{background:var(--alt-bg)}
@@ -352,8 +364,14 @@ section {
 .about-heading{color:var(--accent);margin-bottom:1.25rem}
 .about-rows{display:flex;flex-direction:column;gap:2.5rem}
 .about-row{display:flex;align-items:center;gap:2rem}
-.about-img{width:200px;height:200px;border-radius:50%;object-fit:cover;flex:0 0 200px;border:3px solid rgba(255,255,255,.04)}
-.about-text p{margin:0;color:var(--muted)}
+.about-img{width:220px;height:220px;border-radius:50%;object-fit:cover;flex:0 0 220px;border:6px solid rgba(3,7,18,1);box-shadow:0 10px 30px rgba(2,6,14,.6), inset 0 -6px 0 rgba(255,255,255,.02);}
+.about-text{flex:1}
+.about-text > p{margin:0;color:var(--muted);line-height:1.8}
+
+/* about text 'card' */
+.about-text{background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));padding:1.6rem;border-radius:14px;border:1px solid rgba(255,255,255,.03)}
+
+.about-row + .about-row { margin-top: .6rem }
 
 /* skills grid: floating cards */
 .skills-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:1.25rem}
@@ -363,7 +381,7 @@ section {
 .skill-card{--delay: calc(var(--i) * 0.12s);animation-delay:var(--delay)}
 .skill-emoji{font-size:1.8rem}
 .skill-name{font-weight:700}
-.skill-card:hover{transform:translateY(-10px);box-shadow:0 24px 60px rgba(29,185,84,.14);border-color:rgba(29,185,84,.6)}
+.skill-card:hover{transform:translateY(-10px);box-shadow:0 30px 80px rgba(2,6,14,.6);border-color:rgba(29,185,84,.6)}
 @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-8px)}100%{transform:translateY(0)}}
 
 /* contact */
@@ -402,7 +420,7 @@ html {
 }
 
 .container {
-	max-width: 900px;
+	max-width: 1100px;
 	margin: 0 auto;
 	padding: 2rem 1rem
 }
@@ -496,7 +514,7 @@ html {
 	}
 
 	.hero {
-		min-height: 44vh;
+		min-height: 52vh;
 		padding-top: 3.5rem;
 	}
 
