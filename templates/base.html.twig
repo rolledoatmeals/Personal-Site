@@ -4,12 +4,32 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 	<title>{% block title %}{{ site.title|default('Zachary Shepelsky') }}{% endblock %}</title>
-	<meta name="description" content="{{ site.tagline|default('AI Automation & Web Developer') }}">
+	<meta name="description" content="{{ seo.description|default(site.tagline|default('AI Automation & Web Developer')) }}">
+	<meta name="keywords" content="{{ seo.keywords|default('Zachary Shepelsky, AI automation, web developer') }}">
+	<meta name="author" content="{{ site.title|default('Zachary Shepelsky') }}">
+	<meta name="robots" content="{{ seo.robots|default('index,follow') }}">
+	<meta name="theme-color" content="#0a0f1e">
+
+	<link rel="canonical" href="{{ seo.canonical_url|default('/') }}">
+
+	<meta property="og:locale" content="{{ seo.locale|default('en_US') }}">
+	<meta property="og:type" content="{{ seo.og_type|default('website') }}">
+	<meta property="og:site_name" content="{{ site.title|default('Zachary Shepelsky') }}">
+	<meta property="og:title" content="{{ seo.title|default(site.title|default('Zachary Shepelsky')) }}">
+	<meta property="og:description" content="{{ seo.description|default(site.tagline|default('AI Automation & Web Developer')) }}">
+	<meta property="og:url" content="{{ seo.canonical_url|default('/') }}">
+
+	<meta name="twitter:card" content="summary">
+	<meta name="twitter:title" content="{{ seo.title|default(site.title|default('Zachary Shepelsky')) }}">
+	<meta name="twitter:description" content="{{ seo.description|default(site.tagline|default('AI Automation & Web Developer')) }}">
 
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="/assets/css/style.css">
+	{% if seo.json_ld is defined %}
+		<script type="application/ld+json">{{ seo.json_ld|raw }}</script>
+	{% endif %}
 </head>
 <body>
 	<div class="site-loader" aria-hidden="true"><div class="loader-dot"></div></div>
