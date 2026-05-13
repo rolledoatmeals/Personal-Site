@@ -10,6 +10,9 @@ This repository contains a small PHP personal site for Zachary Shepelsky. It use
 
 ## How It Works
 
+
+
+
 - `public/index.php` bootstraps Composer autoloading, builds the page data, and renders the Twig view.
 - `templates/` contains the layout, page template, and shared partials.
 - `public/assets/` contains the site CSS and JavaScript.
