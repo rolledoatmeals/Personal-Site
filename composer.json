@@ -1,0 +1,11 @@
+{
+    "name": "zachshepelsky/zachary-shepelsky",
+    "autoload": {
+        "psr-4": {
+            "Zachshepelsky\\ZacharyShepelsky\\": "src/"
+        }
+    },
+    "require": {
+        "twig/twig": "^3.24"
+    }
+}

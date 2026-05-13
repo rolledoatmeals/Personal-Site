@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Home — {{ site.title }}{% endblock %}
+
+{% block content %}
+  {% include 'partials/nav.html.twig' %}
+
+  <main>
+    <section id="hero" class="hero">
+      <div class="container">
+        <h1>{{ person.name }}</h1>
+        <p class="tagline">{{ site.tagline }}</p>
+        <a class="scroll-down" href="#about" aria-label="Scroll to about">Learn more ↓</a>
+      </div>
+    </section>
+
+    <section id="about" class="about">
+      <div class="container">
+        <h2>About</h2>
+        <p>{{ person.bio }}</p>
+        <h3>Hobbies</h3>
+        <ul class="hobbies">
+          {% for hobby in person.hobbies %}
+            <li>{{ hobby }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </section>
+
+    <section id="skills" class="skills">
+      <div class="container">
+        <h2>What I work with</h2>
+        <div class="tags">
+          {% set skills = person.works_with is defined ? person.works_with : (works_with is defined ? works_with : []) %}
+          {% if skills|length > 0 %}
+            {% for s in skills %}<span class="tag">{{ s }}</span>{% endfor %}
+          {% else %}
+            <p class="muted">PHP · JavaScript · AI · APIs</p>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="contact">
+      <div class="container">
+        <h2>Contact</h2>
+        <p><a href="mailto:{{ contact.email }}">{{ contact.email }}</a> · <a href="{{ contact.linkedin }}" target="_blank" rel="noopener">LinkedIn</a></p>
+      </div>
+    </section>
+  </main>
+
+  {% include 'partials/footer.html.twig' %}
+
+  <style>
+    html{scroll-behavior:smooth}
+    .container{max-width:900px;margin:0 auto;padding:2rem 1rem}
+    .hero{display:flex;align-items:center;min-height:60vh}
+    .hero h1{font-size:clamp(1.8rem,4vw,3.4rem);margin:0}
+    .tagline{color:#444;margin:.75rem 0 1.25rem}
+    .scroll-down{display:inline-block;text-decoration:none;color:inherit}
+    .hobbies{display:flex;flex-wrap:wrap;gap:.5rem;padding:0;margin:.5rem 0 0 0;list-style:none}
+    .hobbies li{background:rgba(0,0,0,0.04);padding:.35rem .6rem;border-radius:999px}
+    .tags{display:flex;flex-wrap:wrap;gap:.5rem}
+    .tag{background:#111;color:#fff;padding:.35rem .6rem;border-radius:999px;font-size:.95rem}
+    .muted{color:#666}
+    @media (max-width:600px){.hero{min-height:44vh;padding-top:3.5rem}}
+  </style>
+
+{% endblock %}

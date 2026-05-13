@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>{% block title %}{{ site.title|default('Zachary Shepelsky') }}{% endblock %}</title>
+	<meta name="description" content="{{ site.tagline|default('AI Automation & Web Developer') }}">
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+
+	<style>
+		:root{
+			--font-body: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+			--font-heading: 'Syne', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+		}
+		body{font-family:var(--font-body);}
+		h1,h2,h3,h4,h5,h6{font-family:var(--font-heading);}
+	</style>
+
+	<link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+	<div class="site-loader" aria-hidden="true"><div class="loader-dot"></div></div>
+	<div id="page">
+		{% block content %}{% endblock %}
+	</div>
+
+	<script src="/assets/js/main.js" defer></script>
+</body>
+</html>
+
