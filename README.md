@@ -47,11 +47,27 @@ make run PORT=8080
 make run HOST=0.0.0.0 PORT=8080
 ```
 
+## Quick Start (alternate)
+
+If you prefer a single command without Makefile:
+
+```bash
+php -S 0.0.0.0:8000 -t public
+```
+
+Open http://127.0.0.1:8000 or http://<your-lan-ip>:8000 to preview.
+
+## Production notes
+
+- Generate WebP images and include srcset for responsive loading.
+- Serve static assets (CSS/JS/images) with cache headers and gzip compression.
+- Use a platform like Heroku (Procfile included) or any PHP-capable host.
+
 ## TODO
 
-- Apply text compression
-- Fix the `robots.txt`
-- Write more content: subtext, bio, pictures, skills, and contact section
+- Apply text compressio; done
+- Fix the `robots.txt`; done
+- Write more content: subtext, bio, pictures, skills, and contact section;
 - Separate the sections more clearly
 - Fix the footer styling
 - Make the skills section look really cool

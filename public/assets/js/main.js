@@ -69,11 +69,21 @@
 		onScroll();
 	}
 
+	function setupSkillCardVars() {
+		const cards = document.querySelectorAll('.skill-card[data-i]');
+		if (!cards || !cards.length) return;
+		cards.forEach(function (c) {
+			const idx = c.getAttribute('data-i') || '0';
+			c.style.setProperty('--i', idx);
+		});
+	}
+
 	onReady(function () {
 		setupLoader();
 		setupAnchorScroll();
 		setupMobileNav();
 		setupNavScrollState();
+		setupSkillCardVars();
 	});
 })();
 
