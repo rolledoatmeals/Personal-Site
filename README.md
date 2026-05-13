@@ -59,3 +59,4 @@ make run HOST=0.0.0.0 PORT=8080
 - Add SEO and AI discovery improvements
 - Create a sitemap
 - Set up deployment for Heroku
+- create and add a decent favicon (your initials are fine ZS)
