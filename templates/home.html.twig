@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Home — {{ site.title }}{% endblock %}
+{% block title %}{{ site.title }}{% endblock %}
 
 {% block content %}
   {% include 'partials/nav.html.twig' %}
@@ -50,20 +50,4 @@
   </main>
 
   {% include 'partials/footer.html.twig' %}
-
-  <style>
-    html{scroll-behavior:smooth}
-    .container{max-width:900px;margin:0 auto;padding:2rem 1rem}
-    .hero{display:flex;align-items:center;min-height:60vh}
-    .hero h1{font-size:clamp(1.8rem,4vw,3.4rem);margin:0}
-    .tagline{color:#444;margin:.75rem 0 1.25rem}
-    .scroll-down{display:inline-block;text-decoration:none;color:inherit}
-    .hobbies{display:flex;flex-wrap:wrap;gap:.5rem;padding:0;margin:.5rem 0 0 0;list-style:none}
-    .hobbies li{background:rgba(0,0,0,0.04);padding:.35rem .6rem;border-radius:999px}
-    .tags{display:flex;flex-wrap:wrap;gap:.5rem}
-    .tag{background:#111;color:#fff;padding:.35rem .6rem;border-radius:999px;font-size:.95rem}
-    .muted{color:#666}
-    @media (max-width:600px){.hero{min-height:44vh;padding-top:3.5rem}}
-  </style>
-
 {% endblock %}
