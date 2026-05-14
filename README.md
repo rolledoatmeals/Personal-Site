@@ -65,17 +65,15 @@ Open http://127.0.0.1:8000 or http://<your-lan-ip>:8000 to preview.
 
 ## TODO
 
-- Apply text compressio; done
-- Fix the `robots.txt`; done
 - Write more content: subtext, bio, pictures, skills, and contact section;
 - Separate the sections more clearly
-- Fix the footer styling
 - Make the skills section look really cool
 - Fix the links so they all have uniform hovering (make the hovers super cool)
 - Add SEO and AI discovery improvements
-- Create a sitemap
 - Set up deployment for Heroku
-- create and add a decent favicon (your initials are fine ZS)
+- for the hover on the nav.. if entering on left side have it go left to right, if entering from right side, have it go right to left
+- make linkedin symbol white and add a hover effect
+- when you click to open the mobile nav, make an animation to switch the burger icon into an x
 
 
 ## Skills to Write about:

@@ -1,8 +1,4 @@
 User-agent: *
 Allow: /
 
-# Sitemap (uncomment and update if you publish a sitemap)
-# Sitemap: https://zacharyshepelsky.com/sitemap.xml
-
-# Crawl-delay can be added for polite crawling (seconds)
-# Crawl-delay: 10
+Sitemap: https://zacharyshepelsky.com/sitemap.xml
