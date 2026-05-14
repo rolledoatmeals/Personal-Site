@@ -74,6 +74,7 @@ Open http://127.0.0.1:8000 or http://<your-lan-ip>:8000 to preview.
 - for the hover on the nav.. if entering on left side have it go left to right, if entering from right side, have it go right to left
 - make linkedin symbol white and add a hover effect
 - when you click to open the mobile nav, make an animation to switch the burger icon into an x
+- fix alt text
 - update so nav links dont append the url
 
 
