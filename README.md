@@ -65,20 +65,20 @@ Open http://127.0.0.1:8000 or http://<your-lan-ip>:8000 to preview.
 
 ## TODO
 
-- Write more content: subtext, bio, pictures, skills, and contact section;
-- Separate the sections more clearly
-- Make the skills section look really cool
+- Write more content: subtext, bio, pictures, skills, and contact section; done
+- Separate the sections more clearly; done
+- Make the skills section look really cool; done
 - Set up deployment for Heroku
-- fix alt text
-- bottom arrow still appends the url, fix.
-- enable caching for images
-- images are too large for where they are being displayed, they should be at most, double the size of the display.
-- compress the images
-- when an image is above the fold, it should not be lazyloaded. also want high fetch priority for above the fold images
-- get in touch buttons should stack and be same width on mobile
-- give each section a bunch more padding top and bottom, align the content in the center
-- line up center the image and paragraph next to it
-- add a fun animation for when the page first loads
+- fix alt text; done
+- bottom arrow still appends the url, fix.; done
+- enable caching for images; done
+- images are too large for where they are being displayed, they should be at most, double the size of the display; done
+- compress the images; done
+- when an image is above the fold, it should not be lazyloaded. also want high fetch priority for above the fold images; done
+- get in touch buttons should stack and be same width on mobile; done
+- give each section a bunch more padding top and bottom, align the content in the center; done
+- line up center the image and paragraph next to it; done
+- add a fun animation for when the page first loads; done
 
 ## Skills to Write about:
 HTML

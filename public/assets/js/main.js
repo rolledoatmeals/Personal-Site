@@ -10,6 +10,25 @@
 		window.addEventListener('load', function () {
 			if (!loader) return;
 			loader.classList.add('hidden');
+			document.body.classList.add('loaded');
+
+			var heroChars = document.querySelectorAll('.hero-title .char');
+			var total = heroChars.length || 1;
+			heroChars.forEach(function (span, i) {
+				var enter = (i * 0.048 + 0.12).toFixed(3);
+				var idle  = '-' + (i / total * 5).toFixed(2);
+				span.style.animation =
+					'hero-char-enter .52s cubic-bezier(.34,1.56,.64,1) ' + enter + 's both,' +
+					'color-spin-idle 5s linear ' + idle + 's infinite';
+
+				span.addEventListener('animationend', function cleanup(e) {
+					if (e.animationName !== 'hero-char-enter') return;
+					span.removeEventListener('animationend', cleanup);
+					span.style.animation = '';
+					span.style.animationDelay = idle + 's';
+				});
+			});
+
 			setTimeout(function () {
 				if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
 			}, 500);
@@ -141,12 +160,57 @@
 		});
 	}
 
+	function setupSkillTilt() {
+		var cards = document.querySelectorAll('.skill-card');
+		cards.forEach(function (card) {
+			var lastRipple = 0;
+
+			card.addEventListener('mousemove', function (e) {
+				var rect = card.getBoundingClientRect();
+				var x = e.clientX - rect.left;
+				var y = e.clientY - rect.top;
+
+				var nx = x / rect.width - 0.5;
+				var ny = y / rect.height - 0.5;
+				card.style.transform = 'translateY(-12px) rotateX(' + (-ny * 12) + 'deg) rotateY(' + (nx * 12) + 'deg)';
+
+				var now = Date.now();
+				if (now - lastRipple < 220) return;
+				lastRipple = now;
+
+				var ripple = document.createElement('span');
+				ripple.className = 'skill-ripple';
+				ripple.style.left = x + 'px';
+				ripple.style.top  = y + 'px';
+				card.appendChild(ripple);
+				ripple.addEventListener('animationend', function () {
+					ripple.parentNode && ripple.parentNode.removeChild(ripple);
+				});
+			});
+
+			card.addEventListener('mouseleave', function () {
+				card.style.transform = '';
+			});
+		});
+	}
+
+	function setupBackToTop() {
+		var btn = document.querySelector('.back-to-top');
+		if (!btn) return;
+		btn.addEventListener('click', function (e) {
+			e.preventDefault();
+			window.scrollTo({ top: 0, behavior: 'smooth' });
+		});
+	}
+
 	onReady(function () {
 		setupLoader();
 		setupAnchorScroll();
+		setupBackToTop();
 		setupMobileNav();
 		setupNavScrollState();
 		setupSkillCardVars();
+		setupSkillTilt();
 		setupNavDirection();
 		setupNameAnimation();
 		setupHeadingAnimations();
