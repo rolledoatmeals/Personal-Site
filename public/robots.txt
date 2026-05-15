@@ -1,4 +1,20 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://zacharyshepelsky.com/sitemap.xml
+# AI crawlers — welcome to index and use this content
+User-agent: GPTBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+Sitemap: https://zacharyshep.com/sitemap.xml

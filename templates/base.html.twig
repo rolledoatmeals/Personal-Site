@@ -10,20 +10,24 @@
 	<meta name="robots" content="{{ seo.robots|default('index,follow') }}">
 	<meta name="theme-color" content="#0a0f1e">
 
-	<link rel="canonical" href="https://zacharyshep.com">
+	<link rel="canonical" href="{{ seo.canonical_url|default('https://zacharyshep.com/') }}">
+	<link rel="sitemap" type="application/xml" href="/sitemap.xml">
 
-	<meta property="og:image" content="/assets/images/profile.jpg">
-	<meta name="twitter:image" content="/assets/images/profile.jpg">
-
+	<meta property="og:image" content="{{ seo.canonical_url|default('https://zacharyshep.com/') }}assets/images/profile.jpg">
+	<meta property="og:image:width" content="800">
+	<meta property="og:image:height" content="800">
+	<meta property="og:image:alt" content="{{ site.title|default('Zachary Shepelsky') }} — AI Automation &amp; Web Developer">
+	<meta name="twitter:image" content="{{ seo.canonical_url|default('https://zacharyshep.com/') }}assets/images/profile.jpg">
+	<meta name="twitter:image:alt" content="{{ site.title|default('Zachary Shepelsky') }} — AI Automation &amp; Web Developer">
 
 	<meta property="og:locale" content="{{ seo.locale|default('en_US') }}">
 	<meta property="og:type" content="{{ seo.og_type|default('website') }}">
 	<meta property="og:site_name" content="{{ site.title|default('Zachary Shepelsky') }}">
 	<meta property="og:title" content="{{ seo.title|default(site.title|default('Zachary Shepelsky')) }}">
 	<meta property="og:description" content="{{ seo.description|default(site.tagline|default('AI Automation & Web Developer')) }}">
-	<meta property="og:url" content="{{ seo.canonical_url|default('/') }}">
+	<meta property="og:url" content="{{ seo.canonical_url|default('https://zacharyshep.com/') }}">
 
-	<meta name="twitter:card" content="summary">
+	<meta name="twitter:card" content="summary_large_image">
 	<meta name="twitter:title" content="{{ seo.title|default(site.title|default('Zachary Shepelsky')) }}">
 	<meta name="twitter:description" content="{{ seo.description|default(site.tagline|default('AI Automation & Web Developer')) }}">
 
@@ -35,7 +39,7 @@
 	<!-- simple SVG favicon -->
 	<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230a0f1e'/%3E%3Ctext x='50' y='57' font-size='48' fill='%23fff' text-anchor='middle' font-family='Syne, Arial, sans-serif'%3EZS%3C/text%3E%3C/svg%3E">
 	{% if seo.json_ld is defined %}
-		<script type="application/ld+json">{{ seo.json_ld|raw }}</script>
+		<script type="application/ld+json" nonce="{{ nonce }}">{{ seo.json_ld|raw }}</script>
 	{% endif %}
 </head>
 <body>
@@ -44,7 +48,7 @@
 		{% block content %}{% endblock %}
 	</div>
 
-	<script src="/assets/js/main.js" defer></script>
+	<script src="/assets/js/main.js" defer nonce="{{ nonce }}"></script>
 </body>
 </html>
 

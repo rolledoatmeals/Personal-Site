@@ -17,21 +17,19 @@
             </a>
           </p>
         </div>
-        <a class="scroll-down" href="#about" aria-label="Scroll to about">
-          <span class="arrow">↓</span>
-        </a>
+
       </div>
     </section>
 
     <section id="about" class="about section--alt">
       <div class="container">
-        <h2 class="about-heading">About Me</h2>
+        <h2 class="about-heading">About</h2>
 
         <div class="about-rows">
           <div class="about-row">
             <picture>
-              <source srcset="/assets/images/profile-480.webp 480w, /assets/images/profile-960.webp 960w, /assets/images/profile-1242.webp 1242w" type="image/webp">
-              <img class="about-img" srcset="/assets/images/profile-480.jpg 480w, /assets/images/profile-960.jpg 960w, /assets/images/profile-1242.jpg 1242w" sizes="(max-width:600px) 280px, 200px" src="/assets/images/profile-480.jpg" loading="lazy" alt="Zachary Shepelsky" width="200" height="200">
+              <source srcset="/assets/images/snowboard-480.webp 480w, /assets/images/snowboard-960.webp 960w, /assets/images/snowboard-1179.webp 1179w" type="image/webp">
+              <img class="about-img" srcset="/assets/images/snowboard-480.jpg 480w, /assets/images/snowboard-960.jpg 960w, /assets/images/snowboard-1179.jpg 1179w" sizes="(max-width:600px) 280px, 200px" src="/assets/images/snowboard-480.jpg" loading="lazy" alt="Snowboarding" width="200" height="200">
             </picture>
             <div class="about-text">
               <p class="about-bio">{{ person.bio|nl2br|raw }}</p>
@@ -40,11 +38,11 @@
 
           <div class="about-row">
             <picture>
-              <source srcset="/assets/images/snowboard-480.webp 480w, /assets/images/snowboard-960.webp 960w, /assets/images/snowboard-1179.webp 1179w" type="image/webp">
-              <img class="about-img" srcset="/assets/images/snowboard-480.jpg 480w, /assets/images/snowboard-960.jpg 960w, /assets/images/snowboard-1179.jpg 1179w" sizes="(max-width:600px) 280px, 200px" src="/assets/images/snowboard-480.jpg" loading="lazy" alt="Snowboarding" width="200" height="200">
+              <source srcset="/assets/images/profile-480.webp 480w, /assets/images/profile-960.webp 960w, /assets/images/profile-1242.webp 1242w" type="image/webp">
+              <img class="about-img" srcset="/assets/images/profile-480.jpg 480w, /assets/images/profile-960.jpg 960w, /assets/images/profile-1242.jpg 1242w" sizes="(max-width:600px) 280px, 200px" src="/assets/images/profile-480.jpg" loading="lazy" alt="Zachary Shepelsky" width="200" height="200">
             </picture>
             <div class="about-text">
-              <p class="about-hobbies">Hobbies: {% for h in person.hobbies %}{{ h }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
+              <p class="about-bio">{{ person.bio2 }}</p>
             </div>
           </div>
         </div>
