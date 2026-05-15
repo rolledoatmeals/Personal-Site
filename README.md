@@ -68,14 +68,17 @@ Open http://127.0.0.1:8000 or http://<your-lan-ip>:8000 to preview.
 - Write more content: subtext, bio, pictures, skills, and contact section;
 - Separate the sections more clearly
 - Make the skills section look really cool
-- Fix the links so they all have uniform hovering (make the hovers super cool);
-- Add SEO and AI discovery improvements; done
 - Set up deployment for Heroku
-- fix alt text; done
-- for the hover on the nav.. if entering on left side have it go left to right, if entering from right side, have it go right to left; done
-- make linkedin symbol white and add a hover effect; done
-- when you click to open the mobile nav, make an animation to switch the burger icon into an x; done
-- update so nav links dont append the url; done
+- fix alt text
+- bottom arrow still appends the url, fix.
+- enable caching for images
+- images are too large for where they are being displayed, they should be at most, double the size of the display.
+- compress the images
+- when an image is above the fold, it should not be lazyloaded. also want high fetch priority for above the fold images
+- get in touch buttons should stack and be same width on mobile
+- give each section a bunch more padding top and bottom, align the content in the center
+- line up center the image and paragraph next to it
+- add a fun animation for when the page first loads
 
 ## Skills to Write about:
 HTML
