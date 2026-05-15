@@ -71,11 +71,11 @@ Open http://127.0.0.1:8000 or http://<your-lan-ip>:8000 to preview.
 - Fix the links so they all have uniform hovering (make the hovers super cool);
 - Add SEO and AI discovery improvements; done
 - Set up deployment for Heroku
+- fix alt text; done
 - for the hover on the nav.. if entering on left side have it go left to right, if entering from right side, have it go right to left; done
 - make linkedin symbol white and add a hover effect; done
 - when you click to open the mobile nav, make an animation to switch the burger icon into an x; done
 - update so nav links dont append the url; done
-
 
 ## Skills to Write about:
 HTML
