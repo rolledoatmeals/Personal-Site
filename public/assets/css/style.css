@@ -679,7 +679,8 @@ body.loaded .hero-links      { animation: hero-text-enter .6s  cubic-bezier(.22,
 	}
 
 	section {
-		padding: 5rem 0;
+		min-height: unset;
+		padding: 3rem 0;
 	}
 
 	/* stack about rows on small screens */
