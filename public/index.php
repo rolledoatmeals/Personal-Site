@@ -115,7 +115,7 @@ $data = [
 		'name' => $siteTitle,
 		'location' => 'Tampa, Florida',
 		'bio' => "I work in web development and AI automation out of Tampa, Florida. I started by building real things for real clients — websites, automation flows, CRM integrations — and learned what I needed along the way.\n\nMost of my time is spent in PHP, HTML, CSS, JavaScript, and AI tooling. I've done freelance automation work with GoHighLevel, set up webhook-driven CRM systems, built AI chatbots, and managed social media growth from zero. Every project gets the same approach: figure out what actually needs to happen, then build it properly.",
-		'bio2' => "Outside of work I'm at the gym, snowboarding when the season hits, at the beach, or trying somewhere new to eat in Tampa. I try to stay active and keep my head clear away from screens.",
+		'bio2' => "Outside of work I'm at the gym, snowboarding when the season hits, at the beach, or trying somewhere new to eat in Tampa. I also spend time building personal projects, applications, and useful tools with code. I try to stay active and keep sharp.",
 		'hobbies' => ['Gym', 'Snowboarding', 'Beach', 'Food'],
 	],
 	'skills' => [
