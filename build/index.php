@@ -17,11 +17,26 @@ $contactEmail = 'zshepelsky@gmail.com';
 $linkedinUrl = 'https://www.linkedin.com/in/zachary-shepelsky/';
 
 $requestHost = $_SERVER['HTTP_HOST'] ?? '127.0.0.1:8000';
+$requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 $forwardedProto = $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '';
 $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $forwardedProto === 'https';
-$scheme = $isHttps ? 'https' : 'http';
-$siteUrl = sprintf('%s://%s', $scheme, $requestHost);
-$canonicalUrl = rtrim($siteUrl, '/') . '/';
+$normalizedHost = strtolower(preg_replace('/:\d+$/', '', $requestHost));
+$canonicalHost = 'www.zacharyshep.com';
+$canonicalUrl = sprintf('https://%s/', $canonicalHost);
+$hostsRequiringCanonicalRedirect = [
+	'zacharyshep.com',
+	'zach-peronal-site-5187db19fc90.herokuapp.com',
+];
+
+if (!headers_sent()) {
+	$shouldRedirectToCanonical = in_array($normalizedHost, $hostsRequiringCanonicalRedirect, true)
+		|| ($normalizedHost === $canonicalHost && !$isHttps);
+
+	if ($shouldRedirectToCanonical) {
+		header('Location: https://' . $canonicalHost . $requestUri, true, 301);
+		exit;
+	}
+}
 
 $data = [
 	'site' => [

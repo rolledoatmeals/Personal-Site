@@ -17,4 +17,4 @@ Allow: /
 User-agent: Applebot-Extended
 Allow: /
 
-Sitemap: https://zacharyshep.com/sitemap.xml
+Sitemap: https://www.zacharyshep.com/sitemap.xml
