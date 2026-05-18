@@ -1,29 +1,29 @@
-<header class="site-nav" role="banner">
-  <div class="nav-inner">
-    <a class="logo" href="/" aria-label="Home">
-      <span class="logo-mark">ZS</span>
-    </a>
+  <header class="site-nav" role="banner">
+    <div class="nav-inner">
+      <a class="logo" href="/" aria-label="Home">
+        <span class="logo-mark">ZS</span>
+      </a>
 
-    <nav class="nav-links" role="navigation" aria-label="Primary">
-      <ul>
-        {% for item in nav %}
+      <nav class="nav-links" role="navigation" aria-label="Primary">
+        <ul>
+{% for item in nav %}
           <li><a href="#" data-scroll="{{ item.scroll }}">{{ item.label }}</a></li>
-        {% endfor %}
-      </ul>
-    </nav>
+{% endfor %}
+        </ul>
+      </nav>
 
-    <button class="hamburger" aria-controls="mobile-menu" aria-expanded="false" aria-label="Toggle menu">
-      <span class="bar"></span>
-      <span class="bar"></span>
-      <span class="bar"></span>
-    </button>
-  </div>
+      <button class="hamburger" aria-controls="mobile-menu" aria-expanded="false" aria-label="Toggle menu">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+    </div>
 
-  <div id="mobile-menu" class="mobile-menu" hidden>
-    <ul>
-      {% for item in nav %}
+    <div id="mobile-menu" class="mobile-menu" hidden>
+      <ul>
+{% for item in nav %}
         <li><a href="#" data-scroll="{{ item.scroll }}">{{ item.label }}</a></li>
-      {% endfor %}
-    </ul>
-  </div>
-</header>
+{% endfor %}
+      </ul>
+    </div>
+  </header>

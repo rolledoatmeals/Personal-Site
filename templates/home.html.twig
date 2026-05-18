@@ -3,7 +3,7 @@
 {% block title %}{{ site.title }} | {{ site.tagline }}{% endblock %}
 
 {% block content %}
-  {% include 'partials/nav.html.twig' %}
+{% include 'partials/nav.html.twig' %}
 
   <main>
     <section id="hero" class="hero section--dark">
@@ -54,14 +54,14 @@
       <div class="container">
         <h2>Skills</h2>
         <div class="skills-grid">
-          {% import 'partials/icons.html.twig' as icons %}
-          {% for s in skills %}
+{% import 'partials/icons.html.twig' as icons %}
+{% for s in skills %}
             <div class="skill-card" data-i="{{ loop.index0 }}">
               <div class="skill-emoji">{{ icons.skill_icon(s.name) }}</div>
               <div class="skill-name">{{ s.name }}</div>
               <div class="skill-desc">{{ s.desc }}</div>
             </div>
-          {% endfor %}
+{% endfor %}
         </div>
       </div>
     </section>
@@ -79,5 +79,5 @@
     </section>
   </main>
 
-  {% include 'partials/footer.html.twig' %}
+{% include 'partials/footer.html.twig' %}
 {% endblock %}

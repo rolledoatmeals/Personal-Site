@@ -126,15 +126,8 @@ $data = [
 	'nonce' => $nonce,
 ];
 
-// render to string so we can minify and compress
+// Render to a string so headers and optional gzip transport can be applied first.
 $output = $twig->render('home.html.twig', $data);
-
-// conservative minification: skip if preformatted content exists
-if (stripos($output, '<pre') === false && stripos($output, '<code') === false && stripos($output, '<textarea') === false) {
-	$output = preg_replace('/<!--(?!\s*\[if).*?-->/s', '', $output);
-	$output = preg_replace('/>\s+</', '><', $output);
-	$output = preg_replace('/\s{2,}/', ' ', $output);
-}
 
 if (!headers_sent()) {
 	$csp = implode('; ', [

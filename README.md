@@ -64,32 +64,8 @@ Open http://127.0.0.1:8000 or http://<your-lan-ip>:8000 to preview.
 - Use a platform like Heroku (Procfile included) or any PHP-capable host.
 
 ## TODO
-
-- Write more content: subtext, bio, pictures, skills, and contact section; done
-- Separate the sections more clearly; done
-- Make the skills section look really cool; done
 - Set up deployment for Heroku
-- fix alt text; done
-- bottom arrow still appends the url, fix.; done
-- enable caching for images; done
-- images are too large for where they are being displayed, they should be at most, double the size of the display; done
-- compress the images; done
-- when an image is above the fold, it should not be lazyloaded. also want high fetch priority for above the fold images; done
-- get in touch buttons should stack and be same width on mobile; done
-- give each section a bunch more padding top and bottom, align the content in the center; done
-- line up center the image and paragraph next to it; done
-- add a fun animation for when the page first loads; done
-
-## Skills to Write about:
-HTML
-CSS
-JavaScript
-PHP
-Symfony (Twig)
-AI
-Vibe Coding
-Git
-Version Control
-SEO Optimization
-AEO Optimization
-Social Media Management
+- images are too large for where they are being displayed, they should be at most, double the size of the display;
+- add caching, look at what lighthouse says about it.
+- align the snowboard image better so you can see your entire self.
+- update hobbies bio to include creating personal projects, applications, useful tools with code. remove stay away from screens.
