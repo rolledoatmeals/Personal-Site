@@ -21,10 +21,10 @@ $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 $forwardedProto = $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '';
 $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $forwardedProto === 'https';
 $normalizedHost = strtolower(preg_replace('/:\d+$/', '', $requestHost));
-$canonicalHost = 'www.zacharyshep.com';
+$canonicalHost = 'zacharyshep.com';
 $canonicalUrl = sprintf('https://%s/', $canonicalHost);
 $hostsRequiringCanonicalRedirect = [
-	'zacharyshep.com',
+	'www.zacharyshep.com',
 	'zach-peronal-site-5187db19fc90.herokuapp.com',
 ];
 

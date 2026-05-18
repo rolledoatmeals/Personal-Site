@@ -25,4 +25,4 @@ Zachary got into development by building real things for real clients and learni
 
 ## Pages
 
-- [Home / Portfolio](https://www.zacharyshep.com/): Full portfolio — about, skills, and contact
+- [Home / Portfolio](https://zacharyshep.com/): Full portfolio — about, skills, and contact
