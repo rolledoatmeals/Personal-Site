@@ -326,7 +326,7 @@ section {
 
 .mobile-menu {
 	display: none;
-	padding: 1rem;
+	overflow: hidden;
 	background: rgba(10, 15, 30, .98);
 	border-top: 1px solid rgba(255, 255, 255, .06);
 }
@@ -334,7 +334,7 @@ section {
 .mobile-menu ul {
 	list-style: none;
 	margin: 0;
-	padding: 0;
+	padding: 1rem;
 	display: flex;
 	flex-direction: column;
 	gap: .5rem;
@@ -1413,11 +1413,36 @@ body.loaded .hero-links {
 
 	.mobile-menu {
 		display: block;
+		max-height: 0;
+		opacity: 0;
+		transform: translateY(-6px);
+		pointer-events: none;
+		transition: max-height .32s cubic-bezier(.4, 0, .2, 1),
+		            opacity .24s ease,
+		            transform .24s ease;
 	}
 
-	.mobile-menu[hidden] {
-		display: none;
+	.mobile-menu.is-open {
+		max-height: 280px;
+		opacity: 1;
+		transform: translateY(0);
+		pointer-events: auto;
 	}
+
+	.mobile-menu li {
+		opacity: 0;
+		transform: translateX(-10px);
+		transition: opacity .18s ease, transform .18s ease;
+	}
+
+	.mobile-menu.is-open li {
+		opacity: 1;
+		transform: translateX(0);
+	}
+
+	.mobile-menu.is-open li:nth-child(1) { transition-delay: .07s; }
+	.mobile-menu.is-open li:nth-child(2) { transition-delay: .13s; }
+	.mobile-menu.is-open li:nth-child(3) { transition-delay: .19s; }
 
 	.hero {
 		min-height: 100vh;

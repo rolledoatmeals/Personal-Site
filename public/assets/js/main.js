@@ -54,18 +54,25 @@
 
 		if (!hamburger || !mobileMenu) return;
 
+		function closeMenu() {
+			hamburger.setAttribute('aria-expanded', 'false');
+			hamburger.classList.remove('open');
+			mobileMenu.classList.remove('is-open');
+		}
+
 		hamburger.addEventListener('click', function () {
 			const isOpen = hamburger.getAttribute('aria-expanded') === 'true';
-
 			hamburger.setAttribute('aria-expanded', String(!isOpen));
 			if (isOpen) {
-				mobileMenu.setAttribute('hidden', '');
-				hamburger.classList.remove('open');
-				return;
+				closeMenu();
+			} else {
+				hamburger.classList.add('open');
+				mobileMenu.classList.add('is-open');
 			}
+		});
 
-			mobileMenu.removeAttribute('hidden');
-			hamburger.classList.add('open');
+		mobileMenu.addEventListener('click', function (e) {
+			if (e.target.closest('a')) closeMenu();
 		});
 	}
 
