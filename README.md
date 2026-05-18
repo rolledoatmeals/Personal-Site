@@ -57,14 +57,21 @@ php -S 0.0.0.0:8000 -t public
 
 Open http://127.0.0.1:8000 or http://<your-lan-ip>:8000 to preview.
 
-## Production notes
+## Deploy
 
-- Generate WebP images and include srcset for responsive loading.
-- Serve static assets (CSS/JS/images) with cache headers and gzip compression.
-- Use a platform like Heroku (Procfile included) or any PHP-capable host.
+Use a single command to create the Heroku app if needed, deploy the current site, and print the live URL:
+
+```bash
+make deploy
+```
+
+If you want to target a different Heroku app name:
+
+```bash
+make deploy HEROKU_APP=my-app-name
+```
 
 ## TODO
-- Set up deployment for Heroku
 - images are too large for where they are being displayed, they should be at most, double the size of the display;
 - add caching, look at what lighthouse says about it.
 - align the snowboard image better so you can see your entire self.
