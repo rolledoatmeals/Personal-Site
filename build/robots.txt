@@ -1,8 +1,20 @@
 User-agent: *
 Allow: /
 
-# Sitemap (uncomment and update if you publish a sitemap)
-# Sitemap: https://zacharyshep.com/sitemap.xml
+# AI crawlers — welcome to index and use this content
+User-agent: GPTBot
+Allow: /
 
-# Crawl-delay can be added for polite crawling (seconds)
-# Crawl-delay: 10
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+Sitemap: https://zacharyshep.com/sitemap.xml

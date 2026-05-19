@@ -50,7 +50,7 @@ make run
 Default server settings:
 
 ```bash
-php -S 127.0.0.1:8000 -t public
+php -S 127.0.0.1:8000 public/router.php
 ```
 
 Open the site at:
@@ -69,7 +69,7 @@ make run HOST=0.0.0.0 PORT=8080
 If you want to skip the Makefile, you can run the built-in PHP server directly:
 
 ```bash
-php -S 0.0.0.0:8000 -t public
+php -S 0.0.0.0:8000 public/router.php
 ```
 
 ## Common Commands

@@ -1,0 +1,28 @@
+# Zachary Shepelsky
+
+> AI Automation & Web Developer based in Tampa, Florida
+
+Zachary Shepelsky is a web developer and AI automation specialist based in Tampa, Florida. He builds automation systems, websites, and integrated CRM pipelines for clients, with a focus on the intersection of AI and practical web development.
+
+## Skills
+
+- PHP, HTML, CSS, JavaScript
+- AI Automation (chatbots, workflow automation)
+- GoHighLevel (GHL) — CRM, pipelines, funnels
+- CRM integration and webhook configuration
+- Social media management and growth
+- Vibe coding / AI-assisted development
+
+## Background
+
+Zachary got into development by building real things for real clients and learning on the job. He has done freelance automation work using GoHighLevel, built and integrated CRM systems with webhook configurations, set up AI chatbots, and managed social media accounts from zero to growth. Every project is approached the same way: figure out what actually needs to happen and build it properly.
+
+## Contact
+
+- Email: zshepelsky@gmail.com
+- LinkedIn: https://www.linkedin.com/in/zachary-shepelsky/
+- Location: Tampa, Florida, USA
+
+## Pages
+
+- [Home / Portfolio](https://zacharyshep.com/): Full portfolio — about, skills, and contact

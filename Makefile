@@ -6,7 +6,7 @@ HEROKU_APP ?= zach-peronal-site
 .PHONY: run optimize audit build heroku-create heroku-deploy heroku-open heroku-verify deploy
 
 run:
-	php -S $(HOST):$(PORT) -t $(DOCROOT)
+	php -S $(HOST):$(PORT) $(DOCROOT)/router.php
 
 optimize:
 	@echo "No-op optimize: generate webp (install cwebp) or use your image toolchain"

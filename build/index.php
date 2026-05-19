@@ -38,6 +38,8 @@ if (!headers_sent()) {
 	}
 }
 
+$nonce = base64_encode(random_bytes(16));
+
 $data = [
 	'site' => [
 		'title' => $siteTitle,
@@ -62,11 +64,23 @@ $data = [
 					'jobTitle' => 'AI Automation & Web Developer',
 					'description' => $siteDescription,
 					'email' => 'mailto:' . $contactEmail,
+					'image' => [
+						'@type' => 'ImageObject',
+						'url' => $canonicalUrl . 'assets/images/profile.jpg',
+						'width' => 800,
+						'height' => 800,
+					],
 					'address' => [
 						'@type' => 'PostalAddress',
 						'addressLocality' => 'Tampa',
 						'addressRegion' => 'FL',
 						'addressCountry' => 'US',
+					],
+					'knowsAbout' => [
+						'PHP', 'HTML', 'CSS', 'JavaScript',
+						'AI Automation', 'GoHighLevel', 'CRM Integration',
+						'Webhook Configuration', 'Web Development',
+						'Social Media Management', 'AI Chatbots',
 					],
 					'sameAs' => [$linkedinUrl],
 				],
@@ -80,38 +94,73 @@ $data = [
 					'publisher' => ['@id' => $canonicalUrl . '#person'],
 				],
 				[
-					'@type' => 'WebPage',
+					'@type' => ['WebPage', 'ProfilePage'],
 					'@id' => $canonicalUrl . '#webpage',
 					'url' => $canonicalUrl,
-					'name' => $siteTitle,
+					'name' => $pageTitle,
 					'description' => $siteDescription,
 					'isPartOf' => ['@id' => $canonicalUrl . '#website'],
 					'about' => ['@id' => $canonicalUrl . '#person'],
+					'mainEntity' => ['@id' => $canonicalUrl . '#person'],
 					'inLanguage' => 'en-US',
+					'dateModified' => date('Y-m-d'),
 				],
 			],
 		], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
 	],
+	'hero' => [
+		'descriptor' => 'I build websites, automation systems, and AI integrations for real clients — focused on what actually delivers results.',
+	],
 	'person' => [
 		'name' => $siteTitle,
 		'location' => 'Tampa, Florida',
-	'bio' => "I work in web development and AI automation, based in Tampa, Florida. I got into it by building real things for real clients and learning as I went. No bootcamp, no formal training, just hands-on work. These days I spend most of my time with PHP, HTML, JavaScript, and AI tools, building automation systems, websites, and anything else that needs to run cleaner and faster. I am drawn to the intersection of AI and web development and I try to stay on top of where that is heading.\n\nI have done freelance automation work using GoHighLevel, built and integrated CRM systems with webhook configurations, set up AI chatbots, and managed social media growth from zero. Every project I take on I treat the same way: figure out what actually needs to happen and build it properly.\n\nWhen I am not working I am at the gym, snowboarding when the season hits, at the beach, or out eating somewhere good in Tampa. I try to stay active and keep my head clear outside of screens.",
+		'bio' => "I work in web development and AI automation out of Tampa, Florida. I started by building real things for real clients — websites, automation flows, CRM integrations — and learned what I needed along the way.\n\nMost of my time is spent in PHP, HTML, CSS, JavaScript, and AI tooling. I've done freelance automation work with GoHighLevel, set up webhook-driven CRM systems, built AI chatbots, and managed social media growth from zero. Every project gets the same approach: figure out what actually needs to happen, then build it properly.",
+		'bio2' => "Outside of work I'm at the gym, snowboarding when the season hits, at the beach, or trying somewhere new to eat in Tampa. I also spend time building personal projects, applications, and useful tools with code. I try to stay active and keep sharp.",
 		'hobbies' => ['Gym', 'Snowboarding', 'Beach', 'Food'],
 	],
+	'skills' => [
+		['name' => 'PHP',            'desc' => 'Backend logic & server-side scripting'],
+		['name' => 'HTML',           'desc' => 'Semantic, accessible markup'],
+		['name' => 'CSS',            'desc' => 'Responsive layouts & polished UI'],
+		['name' => 'JavaScript',     'desc' => 'Dynamic interactions & browser logic'],
+		['name' => 'AI Automation',  'desc' => 'Chatbots, workflows & AI integrations'],
+		['name' => 'GoHighLevel',    'desc' => 'CRM pipelines & marketing automation'],
+		['name' => 'CRM',            'desc' => 'Webhook configs & system integrations'],
+		['name' => 'Vibe Coding',    'desc' => 'Building fast with AI-assisted tools'],
+	],
 	'nav' => [
-		['label' => 'About', 'href' => '#about'],
-		['label' => 'Skills', 'href' => '#skills'],
-		['label' => 'Contact', 'href' => '#contact'],
+		['label' => 'About', 'scroll' => 'about'],
+		['label' => 'Skills', 'scroll' => 'skills'],
+		['label' => 'Contact', 'scroll' => 'contact'],
 	],
 	'contact' => [
-		'email' => $contactEmail,
+		'email'   => $contactEmail,
 		'linkedin' => $linkedinUrl,
+		'blurb'   => 'Building something and need a developer? Looking to automate your workflow? Want to talk AI? Reach out — I\'d like to hear about it.',
 	],
+	'nonce' => $nonce,
 ];
-// Render to a string so optional gzip transport can be applied first.
+
+// Render to a string so headers and optional gzip transport can be applied first.
 $output = $twig->render('home.html.twig', $data);
 
 if (!headers_sent()) {
+	$csp = implode('; ', [
+		"default-src 'self'",
+		"script-src 'self' 'nonce-{$nonce}'",
+		"style-src 'self'",
+		"font-src 'self'",
+		"img-src 'self' data:",
+		"object-src 'none'",
+		"base-uri 'self'",
+		"frame-ancestors 'none'",
+		"form-action 'self'",
+	]);
+	header("Content-Security-Policy: {$csp}");
+	header('X-Frame-Options: DENY');
+	header('X-Content-Type-Options: nosniff');
+	header('Referrer-Policy: strict-origin-when-cross-origin');
+
 	if (!empty($_SERVER['HTTP_ACCEPT_ENCODING']) && strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== false && extension_loaded('zlib')) {
 		header('Vary: Accept-Encoding');
 		ob_start('ob_gzhandler');
