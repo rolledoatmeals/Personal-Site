@@ -110,9 +110,3 @@ make heroku-open HEROKU_APP=my-app-name
 - `templates/base.html.twig` defines the shared document structure and metadata.
 - `scripts/deploy.sh` packages the app and pushes it to Heroku.
 - Domain DNS can be managed separately from app hosting.
-
-## TODO
-- images are too large for where they are being displayed, they should be at most, double the size of the display;
-- add caching, look at what lighthouse says about it.
-- align the snowboard image better so you can see your entire self.
-- update hobbies bio to include creating personal projects, applications, useful tools with code. remove stay away from screens.
