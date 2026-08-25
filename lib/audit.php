@@ -130,7 +130,7 @@ function audit_run(string $inputUrl): array
 	// Page weight
 	if ($kb > 900) {
 		$score -= 15;
-		$add('bad', "The page itself is {$kb} KB", "Most of your visitors are on phones. A page this heavy makes them wait, and many will not.");
+		$add('bad', "The page itself is {$kb} KB", "Most of your visitors are on phones. A page this heavy makes them wait, and many won't.");
 	} elseif ($kb > 400) {
 		$score -= 7;
 		$add('warn', "The page is {$kb} KB", "Not terrible, but leaner pages rank and convert better on mobile.");
@@ -166,7 +166,7 @@ function audit_run(string $inputUrl): array
 	$tel = preg_match_all('~href=["\']tel:~i', $html);
 	if ($tel === 0) {
 		$score -= 15;
-		$add('bad', "Nobody can tap to call you", "There is no tap-to-call link on this page. On a phone, every extra step between a visitor and your number costs you calls.");
+		$add('bad', "Nobody can tap to call you", "There's no tap-to-call link on this page. On a phone, every extra step between a visitor and your number costs you calls.");
 	} else {
 		$add('good', "Tap-to-call works", "$tel phone link" . ($tel === 1 ? '' : 's') . " found.");
 	}
@@ -197,7 +197,7 @@ function audit_run(string $inputUrl): array
 	// Schema
 	if (!preg_match('~application/ld\+json~i', $html)) {
 		$score -= 5;
-		$add('warn', "No structured data", "Schema markup tells Google and AI search tools what your business is. Without it you are harder to surface.");
+		$add('warn', "No structured data", "Schema markup tells Google and AI search tools what your business is. Without it you're harder to surface.");
 	} else {
 		$add('good', "Structured data present", "Google and AI tools can read what this business is.");
 	}
