@@ -1,0 +1,165 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Compare Two Websites | {{ site.title }}{% endblock %}
+
+{% block content %}
+{% include 'partials/nav.html.twig' %}
+
+  <main>
+    <section id="compare" class="audit section--dark">
+      <div class="container audit-inner">
+        <p class="hero-eyebrow">Live tool &middot; built by {{ person.name }}</p>
+        <h1 class="audit-title">You versus the shop down the road.</h1>
+        <p class="audit-sub">Two websites, the same checks, side by side. Speed, phone experience, search visibility and whether anyone can actually get in touch.</p>
+
+        <form id="cmp-form" class="cmp-form" autocomplete="off">
+          <input id="cmp-a" type="text" inputmode="url" placeholder="yourbusiness.com" aria-label="First website" required>
+          <span class="cmp-vs">vs</span>
+          <input id="cmp-b" type="text" inputmode="url" placeholder="competitor.com" aria-label="Second website" required>
+          <button type="submit" class="btn btn-primary" id="cmp-go">Compare</button>
+        </form>
+
+        <div id="cmp-status" class="audit-status" role="status" aria-live="polite"></div>
+
+        <div id="cmp-result" class="cmp-result" hidden>
+          <div class="cmp-heads">
+            <div class="cmp-head" id="cmp-head-a"></div>
+            <div class="cmp-head" id="cmp-head-b"></div>
+          </div>
+          <div id="cmp-rows" class="cmp-rows"></div>
+          <p class="cmp-verdict" id="cmp-verdict"></p>
+          <div class="audit-cta">
+            <p>Want a full breakdown of either one?</p>
+            <div class="audit-cta-actions">
+              <a class="btn btn-ghost" id="cmp-link-a" href="#">Full report, first site</a>
+              <a class="btn btn-ghost" id="cmp-link-b" href="#">Full report, second site</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+{% include 'partials/footer.html.twig' %}
+
+<style nonce="{{ nonce }}" id="cmp-dyn"></style>
+<script nonce="{{ nonce }}">
+(function () {
+	var dyn = document.getElementById('cmp-dyn');
+	var form = document.getElementById('cmp-form');
+	var A = document.getElementById('cmp-a');
+	var B = document.getElementById('cmp-b');
+	var status = document.getElementById('cmp-status');
+	var result = document.getElementById('cmp-result');
+	var btn = document.getElementById('cmp-go');
+
+	function band(n) { return n >= 85 ? 'is-good' : n >= 60 ? 'is-warn' : 'is-bad'; }
+
+	function run(a, b) {
+		btn.disabled = true;
+		result.hidden = true;
+		status.textContent = 'Checking both sites the way a phone would...';
+		fetch('/api/compare?a=' + encodeURIComponent(a) + '&b=' + encodeURIComponent(b))
+			.then(function (r) { return r.json(); })
+			.then(function (d) {
+				btn.disabled = false;
+				if (d.error) { status.textContent = d.error; return; }
+				status.textContent = '';
+				render(d.a, d.b);
+			})
+			.catch(function () {
+				btn.disabled = false;
+				status.textContent = 'Something went wrong on my end. Try once more.';
+			});
+	}
+
+	form.addEventListener('submit', function (e) {
+		e.preventDefault();
+		var a = A.value.trim(), b = B.value.trim();
+		if (!a || !b) return;
+		history.replaceState(null, '', location.pathname + '?a=' + encodeURIComponent(a) + '&b=' + encodeURIComponent(b));
+		run(a, b);
+	});
+
+	function host(u) { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return u; } }
+
+	function head(el, r, win) {
+		el.innerHTML = '';
+		el.className = 'cmp-head ' + (win ? 'is-winner' : '');
+		var n = document.createElement('div');
+		n.className = 'cmp-host';
+		n.textContent = host(r.url);
+		var sc = document.createElement('div');
+		sc.className = 'cmp-score ' + band(r.score);
+		sc.textContent = r.score;
+		var lab = document.createElement('div');
+		lab.className = 'cmp-sub';
+		lab.textContent = win ? 'out of 100 · ahead' : 'out of 100';
+		el.appendChild(n); el.appendChild(sc); el.appendChild(lab);
+	}
+
+	function render(a, b) {
+		head(document.getElementById('cmp-head-a'), a, a.score > b.score);
+		head(document.getElementById('cmp-head-b'), b, b.score > a.score);
+
+		var rows = document.getElementById('cmp-rows');
+		rows.innerHTML = '';
+		var rules = [];
+		a.categories.forEach(function (ca, i) {
+			var cb = b.categories[i];
+			var row = document.createElement('div');
+			row.className = 'cmp-row';
+
+			var label = document.createElement('div');
+			label.className = 'cmp-label';
+			label.textContent = ca.label;
+
+			function side(c, other, key) {
+				var d = document.createElement('div');
+				d.className = 'cmp-side' + (c.pct > other.pct ? ' is-ahead' : '');
+				var bar = document.createElement('div');
+				bar.className = 'cmp-bar';
+				var fill = document.createElement('i');
+				fill.className = 'cmp-fill ' + band(c.pct);
+				fill.setAttribute('data-k', key);
+				rules.push('.cmp-fill[data-k="' + key + '"]{width:' + c.pct + '%}');
+				bar.appendChild(fill);
+				var num = document.createElement('span');
+				num.className = 'cmp-num ' + band(c.pct);
+				num.textContent = c.pct + '%';
+				d.appendChild(bar); d.appendChild(num);
+				return d;
+			}
+
+			row.appendChild(side(ca, cb, 'a' + i));
+			row.appendChild(label);
+			row.appendChild(side(cb, ca, 'b' + i));
+			rows.appendChild(row);
+		});
+		dyn.textContent = rules.join('');
+
+		var lead = Math.abs(a.score - b.score);
+		var win = a.score >= b.score ? a : b;
+		var lose = a.score >= b.score ? b : a;
+		var v = document.getElementById('cmp-verdict');
+		if (lead === 0) {
+			v.textContent = 'Dead even at ' + a.score + '. Neither site is winning this.';
+		} else {
+			v.textContent = host(win.url) + ' is ahead by ' + lead + ' points. '
+				+ 'Someone choosing between these on their phone meets the better-built one first.';
+		}
+
+		document.getElementById('cmp-link-a').href = '/audit?url=' + encodeURIComponent(a.url);
+		document.getElementById('cmp-link-b').href = '/audit?url=' + encodeURIComponent(b.url);
+		result.hidden = false;
+	}
+
+	var q = new URLSearchParams(location.search);
+	if (q.get('a') && q.get('b')) {
+		A.value = q.get('a');
+		B.value = q.get('b');
+		run(q.get('a'), q.get('b'));
+	}
+})();
+</script>
+{% endblock %}

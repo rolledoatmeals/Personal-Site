@@ -179,6 +179,14 @@ $data = [
 	],
 	'work' => [
 		[
+			'title' => 'Head-to-head comparison',
+			'stat' => 'Two sites, same checks',
+			'context' => 'Live on this site',
+			'blurb' => 'Put two websites side by side and see which one is actually built better. Same engine as the audit tool, pointed at a question a business owner already cares about: how do I stack up against the shop down the road.',
+			'tags' => ['PHP', 'Live tool', 'Sales'],
+			'url' => '/compare',
+		],
+		[
 			'title' => 'Website Audit MCP server',
 			'stat' => 'Install it in one command',
 			'context' => 'Open source on GitHub',
@@ -250,6 +258,7 @@ $data = [
 		['label' => 'Work', 'scroll' => 'work'],
 		['label' => 'Skills', 'scroll' => 'skills'],
 		['label' => 'Audit tool', 'href' => '/audit'],
+		['label' => 'Compare', 'href' => '/compare'],
 		['label' => 'Contact', 'scroll' => 'contact'],
 	],
 	'contact' => [
@@ -261,6 +270,31 @@ $data = [
 ];
 
 // Render to a string so headers and optional gzip transport can be applied first.
+if ($requestPath === '/api/compare') {
+	header('Content-Type: application/json');
+	require_once __DIR__ . '/../lib/audit.php';
+	$ip = trim(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'unknown')[0]);
+	if (!audit_rate_limit($ip, 20)) {
+		http_response_code(429);
+		echo json_encode(['error' => 'Easy there. Try again in a bit.']);
+		exit;
+	}
+	$a = (string) ($_GET['a'] ?? '');
+	$b = (string) ($_GET['b'] ?? '');
+	if ($a === '' || $b === '' || strlen($a) > 300 || strlen($b) > 300) {
+		http_response_code(400);
+		echo json_encode(['error' => 'Give me two website addresses to compare.']);
+		exit;
+	}
+	$type = (string) ($_GET['type'] ?? '');
+	$ra = audit_run($a, $type);
+	$rb = audit_run($b, $type);
+	if (isset($ra['error'])) { echo json_encode(['error' => 'First site: ' . $ra['error']]); exit; }
+	if (isset($rb['error'])) { echo json_encode(['error' => 'Second site: ' . $rb['error']]); exit; }
+	echo json_encode(['a' => $ra, 'b' => $rb]);
+	exit;
+}
+
 if ($requestPath === '/audit/report') {
 	require_once __DIR__ . '/../lib/audit.php';
 	$target = (string) ($_GET['url'] ?? '');
@@ -277,6 +311,17 @@ if ($requestPath === '/audit/report') {
 	$data['seo']['robots'] = 'noindex';
 	audit_security_headers($nonce);
 	echo $twig->render('audit-report.html.twig', $data);
+	exit;
+}
+
+if ($requestPath === '/compare') {
+	$data['seo']['title'] = 'Compare Two Websites | ' . $siteTitle;
+	$data['seo']['description'] = 'Put two websites side by side and see which one is actually built better. Speed, mobile, search visibility and contact paths, scored.';
+	$data['seo']['canonical_url'] = 'https://zacharyshep.com/compare';
+	unset($data['seo']['json_ld']);
+	$data['nonce'] = $nonce;
+	audit_security_headers($nonce);
+	echo $twig->render('compare.html.twig', $data);
 	exit;
 }
 

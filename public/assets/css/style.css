@@ -1777,3 +1777,44 @@ body.loaded .hero-links {
 }
 .audit-type-note { flex-basis: 100%; font-size: .78rem; color: #7d8698 }
 .audit-chip.is-type { border-color: rgba(0,230,118,.35); color: var(--accent) }
+
+/* ---------- Compare ---------- */
+.cmp-form { display: flex; gap: .6rem; align-items: center; max-width: 46rem; margin: 0 auto; flex-wrap: wrap }
+.cmp-form input {
+	flex: 1 1 12rem; min-width: 0;
+	background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.14);
+	border-radius: 100px; padding: .85rem 1.3rem; color: var(--white);
+	font: inherit; font-family: var(--font-mono); font-size: .92rem;
+}
+.cmp-form input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent }
+.cmp-vs { font-family: var(--font-mono); font-size: .8rem; color: var(--muted); flex: 0 0 auto }
+.cmp-result { margin-top: 2.4rem; text-align: left }
+.cmp-heads { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.8rem }
+.cmp-head {
+	border: 1px solid rgba(255,255,255,.1); border-radius: 16px; padding: 1.2rem 1rem;
+	text-align: center; background: rgba(255,255,255,.03);
+}
+.cmp-head.is-winner { border-color: rgba(0,230,118,.45); background: rgba(0,230,118,.06) }
+.cmp-host { font-family: var(--font-mono); font-size: .82rem; color: var(--muted); word-break: break-all; margin-bottom: .35rem }
+.cmp-score { font-family: var(--font-heading); font-size: 2.4rem; line-height: 1; font-weight: 700 }
+.cmp-score.is-good { color: var(--accent) } .cmp-score.is-warn { color: #ffd166 } .cmp-score.is-bad { color: #ff6b6b }
+.cmp-sub { font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: .3rem }
+.cmp-rows { display: flex; flex-direction: column; gap: .9rem }
+.cmp-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: .8rem }
+.cmp-label { font-size: .82rem; color: var(--muted); text-align: center; min-width: 8.5rem }
+.cmp-side { display: flex; align-items: center; gap: .5rem; opacity: .72 }
+.cmp-side.is-ahead { opacity: 1 }
+.cmp-side:first-child { flex-direction: row-reverse }
+.cmp-bar { flex: 1; height: 6px; background: rgba(255,255,255,.07); border-radius: 100px; overflow: hidden }
+.cmp-fill { display: block; height: 100%; width: 0; border-radius: 100px; transition: width .8s cubic-bezier(.22,1,.36,1) }
+.cmp-fill.is-good { background: var(--accent) } .cmp-fill.is-warn { background: #ffd166 } .cmp-fill.is-bad { background: #ff6b6b }
+.cmp-num { font-family: var(--font-mono); font-size: .76rem; min-width: 2.6rem }
+.cmp-num.is-good { color: var(--accent) } .cmp-num.is-warn { color: #ffd166 } .cmp-num.is-bad { color: #ff6b6b }
+.cmp-verdict { margin: 1.8rem 0 0; font-size: 1rem; color: var(--white); line-height: 1.6 }
+@media (max-width: 640px) {
+	.cmp-form { flex-direction: column; align-items: stretch }
+	.cmp-vs { text-align: center }
+	.cmp-row { grid-template-columns: 1fr; gap: .35rem }
+	.cmp-label { text-align: left; min-width: 0 }
+	.cmp-side:first-child { flex-direction: row }
+}
