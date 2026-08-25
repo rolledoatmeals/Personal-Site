@@ -179,27 +179,11 @@ $data = [
 	],
 	'work' => [
 		[
-			'title' => 'Head-to-head comparison',
-			'stat' => 'Two sites, same checks',
-			'context' => 'Live on this site',
-			'blurb' => 'Put two websites side by side and see which one is actually built better. Same engine as the audit tool, pointed at a question a business owner already cares about: how do I stack up against the shop down the road.',
-			'tags' => ['PHP', 'Live tool', 'Sales'],
-			'url' => '/compare',
-		],
-		[
-			'title' => 'Website Audit MCP server',
-			'stat' => 'Install it in one command',
-			'context' => 'Open source on GitHub',
-			'blurb' => 'The same audit engine, handed to AI assistants through the Model Context Protocol. Anyone running Claude Code or Cursor installs it and just says "audit example.com". One capability, shipped two ways: a web page for people, a protocol server for agents.',
-			'tags' => ['MCP', 'Node', 'Open source'],
-			'url' => 'https://github.com/rolledoatmeals/website-audit-mcp',
-		],
-		[
-			'title' => 'Website audit tool',
-			'stat' => 'Try it live, right now',
-			'context' => 'Running on this site',
-			'blurb' => 'Paste any website address and get a scored report in about ten seconds: page weight, oversized images, tap-to-call, and whether search engines can read the page. The same checks I run by hand before quoting a client, automated.',
-			'tags' => ['PHP', 'Live tool', 'Performance'],
+			'title' => 'Website audit engine',
+			'stat' => 'One engine, three front doors',
+			'context' => 'Live here, on GitHub, and inside AI assistants',
+			'blurb' => 'Checks a site the way a phone would and reports what is costing the owner customers: page weight, oversized images, whether search engines can read it, whether anyone can get in touch, whether the copy was written by a machine. Built once, then exposed three ways on purpose. A page anyone can use, a head-to-head comparison against a competitor, and an MCP server so an AI assistant can run it by name.',
+			'tags' => ['PHP', 'Node', 'MCP', 'Live tool'],
 			'url' => '/audit',
 		],
 		[
