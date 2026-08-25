@@ -352,14 +352,31 @@ function audit_run(string $inputUrl, string $typeOverride = ''): array
 			"HTML plus scripts and stylesheets. Nothing bloated.");
 	}
 
+	// An <img> inside a <picture> with a modern <source> is a fallback that
+	// current browsers never download. Measuring it reports a problem the
+	// visitor does not actually have, so drop those from the image scan.
+	$fallbackOnly = [];
+	if (preg_match_all('~<picture\b[^>]*>(.*?)</picture>~is', $html, $pics)) {
+		foreach ($pics[1] as $inner) {
+			if (preg_match('~<source[^>]+type=["\']image/(webp|avif)~i', $inner)
+				&& preg_match('~<img[^>]+src=["\']([^"\']+)["\']~i', $inner, $fb)) {
+				$fallbackOnly[] = $fb[1];
+			}
+		}
+	}
+
 	preg_match_all('~<img[^>]+src=["\']([^"\']+)["\']~i', $html, $i1);
 	preg_match_all('~<source[^>]+srcset=["\']([^"\', ]+)~i', $html, $i2);
 	preg_match_all('~url\((["\']?)([^"\')]+\.(?:jpg|jpeg|png|webp|avif))\1\)~i', $html, $i3);
 	preg_match_all('~(?:data-src|data-image|content)=["\']([^"\']+\.(?:jpg|jpeg|png|webp|avif)[^"\']*)["\']~i', $html, $i4);
 	preg_match_all('~https?://[^"\'\s\\)]+\.(?:jpg|jpeg|png|webp|avif)~i', $html, $i5);
+	$candidates = array_diff(
+		array_unique(array_merge($i1[1], $i2[1], $i3[2], $i4[1], $i5[0])),
+		$fallbackOnly
+	);
 	$imgUrls = array_values(array_filter(array_map(
 		fn($a) => audit_resolve_url($base, $a),
-		array_unique(array_merge($i1[1], $i2[1], $i3[2], $i4[1], $i5[0]))
+		$candidates
 	)));
 	$imgs = audit_weigh($imgUrls, 8);
 	$heavyKb = $imgs['heaviest']['kb'];
