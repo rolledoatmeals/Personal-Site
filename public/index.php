@@ -40,6 +40,28 @@ if (!headers_sent()) {
 
 $nonce = base64_encode(random_bytes(16));
 
+$requestPath = parse_url($requestUri, PHP_URL_PATH) ?: '/';
+
+if ($requestPath === '/api/audit') {
+	header('Content-Type: application/json');
+	require __DIR__ . '/../lib/audit.php';
+	$ip = trim(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'unknown')[0]);
+	if (!audit_rate_limit($ip)) {
+		http_response_code(429);
+		echo json_encode(['error' => 'Easy there. A few audits an hour is plenty; try again in a bit.']);
+		exit;
+	}
+	$target = (string) ($_GET['url'] ?? '');
+	if ($target === '' || strlen($target) > 300) {
+		http_response_code(400);
+		echo json_encode(['error' => 'Give me a website address to look at.']);
+		exit;
+	}
+	echo json_encode(audit_run($target));
+	exit;
+}
+
+
 $data = [
 	'site' => [
 		'title' => $siteTitle,
@@ -114,11 +136,19 @@ $data = [
 	'person' => [
 		'name' => $siteTitle,
 		'location' => 'Tampa, Florida',
-		'bio' => "I do AI operations for an industrial staffing company. Most of that is connecting Salesforce to everything else so the numbers people depend on show up on their own instead of being rebuilt by hand every week.\n\nBefore that I built websites and CRM systems for clients, and I still do through my own studio. The work I like best is when something is quietly broken and nobody has noticed. A form that stopped sending. A report that has been wrong for months. Those are usually configuration problems rather than code problems, and finding them takes patience more than cleverness.",
+		'bio' => "I connect business systems so information moves on its own. CRMs, websites, meeting tools, the spreadsheet somebody rebuilds every Monday. If a person has to copy numbers from one screen to another each week, I can usually make that job disappear.\n\nI got here by building websites and CRM systems for clients, and I still run my own studio doing that today. The work I like best is finding what is quietly broken. A form that stopped sending. A report that has been wrong for months. Nobody notices those until someone goes looking, and going looking is most of what I do.",
 		'bio2' => "Outside work I'm at the gym, snowboarding when there's a season worth catching, or finding somewhere new to eat around Tampa. I'm also taking night classes for an AI degree while working full time.",
 		'hobbies' => ['Gym', 'Snowboarding', 'Beach', 'Food'],
 	],
 	'work' => [
+		[
+			'title' => 'Website audit tool',
+			'stat' => 'Try it live, right now',
+			'context' => 'Running on this site',
+			'blurb' => 'Paste any website address and get a scored report in about ten seconds: page weight, oversized images, tap-to-call, and whether search engines can read the page. The same checks I run by hand before quoting a client, automated.',
+			'tags' => ['PHP', 'Live tool', 'Performance'],
+			'url' => '/audit',
+		],
 		[
 			'title' => 'Salesforce to Align integration',
 			'stat' => 'Daily numbers, zero hands',
@@ -182,17 +212,27 @@ $data = [
 		['label' => 'About', 'scroll' => 'about'],
 		['label' => 'Work', 'scroll' => 'work'],
 		['label' => 'Skills', 'scroll' => 'skills'],
+		['label' => 'Audit tool', 'href' => '/audit'],
 		['label' => 'Contact', 'scroll' => 'contact'],
 	],
 	'contact' => [
 		'email'   => $contactEmail,
 		'linkedin' => $linkedinUrl,
-		'blurb'   => 'If you are hiring for operations, automation, or Salesforce work, I would like to talk. Email is fastest.',
+		'blurb'   => 'Have a system that should run itself, or a team spending hours on work a machine could do? Tell me what is broken. I read everything.',
 	],
 	'nonce' => $nonce,
 ];
 
 // Render to a string so headers and optional gzip transport can be applied first.
+if (($requestPath ?? parse_url($requestUri, PHP_URL_PATH)) === '/audit') {
+	$data['seo']['title'] = 'Free Website Audit | ' . $siteTitle;
+	$data['seo']['description'] = 'Paste a website address and get a plain-English report on speed, mobile usability, and search visibility in about ten seconds.';
+	$data['seo']['canonical_url'] = 'https://zacharyshep.com/audit';
+	unset($data['seo']['json_ld']);
+	echo $twig->render('audit.html.twig', $data);
+	exit;
+}
+
 $output = $twig->render('home.html.twig', $data);
 
 if (!headers_sent()) {

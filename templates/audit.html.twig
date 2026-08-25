@@ -1,0 +1,118 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Free Website Audit | {{ site.title }}{% endblock %}
+
+{% block content %}
+{% include 'partials/nav.html.twig' %}
+
+  <main>
+    <section id="audit" class="audit section--dark">
+      <div class="container audit-inner">
+        <p class="hero-eyebrow">Live tool &middot; built by {{ person.name }}</p>
+        <h1 class="audit-title">Is your website costing you customers?</h1>
+        <p class="audit-sub">Paste an address. In about ten seconds you get the same checks I run by hand before quoting any client: speed, mobile usability, and whether search engines can actually read the page.</p>
+
+        <form id="audit-form" class="audit-form" autocomplete="off">
+          <input id="audit-url" type="text" inputmode="url" placeholder="yourbusiness.com" aria-label="Website address" required>
+          <button type="submit" class="btn btn-primary" id="audit-go">Run the audit</button>
+        </form>
+
+        <div id="audit-status" class="audit-status" role="status" aria-live="polite"></div>
+
+        <div id="audit-result" class="audit-result" hidden>
+          <div class="audit-head">
+            <div class="audit-score-wrap">
+              <svg class="audit-ring" viewBox="0 0 120 120" aria-hidden="true">
+                <circle cx="60" cy="60" r="52" class="audit-ring-bg"/>
+                <circle cx="60" cy="60" r="52" class="audit-ring-fg" id="audit-ring-fg"/>
+              </svg>
+              <div class="audit-score" id="audit-score">0</div>
+            </div>
+            <div class="audit-meta">
+              <p id="audit-checked" class="audit-checked"></p>
+              <p id="audit-platform" class="audit-platform"></p>
+            </div>
+          </div>
+          <ul id="audit-findings" class="audit-findings"></ul>
+          <div class="audit-cta">
+            <p>Want these fixed, or a deeper look at what the automated pass can't see?</p>
+            <a class="btn btn-primary" href="mailto:{{ contact.email }}?subject=Website%20audit%20follow-up">Email me the report</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+{% include 'partials/footer.html.twig' %}
+
+<script nonce="{{ nonce }}">
+(function () {
+	var form = document.getElementById('audit-form');
+	var input = document.getElementById('audit-url');
+	var status = document.getElementById('audit-status');
+	var result = document.getElementById('audit-result');
+	var btn = document.getElementById('audit-go');
+
+	form.addEventListener('submit', function (e) {
+		e.preventDefault();
+		var url = input.value.trim();
+		if (!url) return;
+		btn.disabled = true;
+		result.hidden = true;
+		status.textContent = 'Fetching the page the way a phone would...';
+
+		fetch('/api/audit?url=' + encodeURIComponent(url))
+			.then(function (r) { return r.json(); })
+			.then(function (data) {
+				btn.disabled = false;
+				if (data.error) { status.textContent = data.error; return; }
+				status.textContent = '';
+				render(data);
+			})
+			.catch(function () {
+				btn.disabled = false;
+				status.textContent = 'Something went wrong on my end. Try once more.';
+			});
+	});
+
+	function render(data) {
+		var score = data.score;
+		var scoreEl = document.getElementById('audit-score');
+		var ring = document.getElementById('audit-ring-fg');
+		var C = 2 * Math.PI * 52;
+		ring.style.strokeDasharray = C;
+		ring.style.strokeDashoffset = C;
+		ring.className.baseVal = 'audit-ring-fg ' + (score >= 80 ? 'is-good' : score >= 55 ? 'is-warn' : 'is-bad');
+		document.getElementById('audit-checked').textContent = data.url + ' · ' + data.page_kb + ' KB · ' + data.seconds + 's';
+		document.getElementById('audit-platform').textContent = 'Built on: ' + data.platform;
+
+		var list = document.getElementById('audit-findings');
+		list.innerHTML = '';
+		data.findings.forEach(function (f, i) {
+			var li = document.createElement('li');
+			li.className = 'audit-finding is-' + f.level;
+			li.style.transitionDelay = (i * 70) + 'ms';
+			var t = document.createElement('strong'); t.textContent = f.title;
+			var d = document.createElement('p'); d.textContent = f.detail;
+			li.appendChild(t); li.appendChild(d);
+			list.appendChild(li);
+		});
+
+		result.hidden = false;
+		requestAnimationFrame(function () {
+			requestAnimationFrame(function () {
+				ring.style.strokeDashoffset = String(C * (1 - score / 100));
+				var n = 0;
+				var step = Math.max(1, Math.round(score / 40));
+				var timer = setInterval(function () {
+					n = Math.min(score, n + step);
+					scoreEl.textContent = n;
+					if (n >= score) clearInterval(timer);
+				}, 24);
+				list.classList.add('in');
+			});
+		});
+	}
+})();
+</script>
+{% endblock %}
