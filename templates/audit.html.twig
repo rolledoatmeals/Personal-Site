@@ -40,6 +40,7 @@
             <div class="audit-cta-actions">
               <button type="button" class="btn btn-primary" id="audit-download">Save as PDF</button>
               <button type="button" class="btn btn-ghost" id="audit-copy">Copy as text</button>
+              <button type="button" class="btn btn-ghost" id="audit-share">Copy link</button>
             </div>
           </div>
         </div>
@@ -61,9 +62,7 @@
 	var result = document.getElementById('audit-result');
 	var btn = document.getElementById('audit-go');
 
-	form.addEventListener('submit', function (e) {
-		e.preventDefault();
-		var url = input.value.trim();
+	function run(url) {
 		if (!url) return;
 		btn.disabled = true;
 		result.hidden = true;
@@ -81,7 +80,24 @@
 				btn.disabled = false;
 				status.textContent = 'Something went wrong on my end. Try once more.';
 			});
+	}
+
+	form.addEventListener('submit', function (e) {
+		e.preventDefault();
+		var url = input.value.trim();
+		if (!url) return;
+		var share = location.pathname + '?url=' + encodeURIComponent(url);
+		history.replaceState(null, '', share);
+		run(url);
 	});
+
+	// A link like /audit?url=example.com opens with that audit already running,
+	// so a report can be handed to someone as a single link.
+	var preset = new URLSearchParams(location.search).get('url');
+	if (preset) {
+		input.value = preset;
+		run(preset);
+	}
 
 	function render(data) {
 		var score = data.score;
@@ -324,6 +340,22 @@
 		try { document.execCommand('copy'); done(); } catch (e) {}
 		document.body.removeChild(ta);
 	}
+
+	document.getElementById('audit-share').addEventListener('click', function () {
+		if (!lastReport) return;
+		var btn = this;
+		var link = location.origin + location.pathname + '?url=' + encodeURIComponent(lastReport.url);
+		var done = function () {
+			var was = btn.textContent;
+			btn.textContent = 'Link copied';
+			setTimeout(function () { btn.textContent = was; }, 1600);
+		};
+		if (navigator.clipboard && window.isSecureContext) {
+			navigator.clipboard.writeText(link).then(done, function () { fallback(link, done); });
+		} else {
+			fallback(link, done);
+		}
+	});
 
 })();
 </script>
