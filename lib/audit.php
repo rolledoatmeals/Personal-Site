@@ -280,12 +280,12 @@ function audit_run(string $inputUrl, string $typeOverride = ''): array
 
 	// Categories carry their own weight so one bad area can't sink the score alone.
 	$cats = [
-		'speed'   => ['label' => 'Speed',            'weight' => 25, 'lost' => 0, 'findings' => []],
-		'mobile'  => ['label' => 'Phone experience', 'weight' => 20, 'lost' => 0, 'findings' => []],
-		'search'  => ['label' => 'Getting found',    'weight' => 15, 'lost' => 0, 'findings' => []],
-		'contact' => ['label' => 'Getting in touch', 'weight' => 16, 'lost' => 0, 'findings' => []],
-		'copy'    => ['label' => 'How the writing reads', 'weight' => 12, 'lost' => 0, 'findings' => []],
-		'design'  => ['label' => 'How current it looks',  'weight' => 12, 'lost' => 0, 'findings' => []],
+		'speed'   => ['label' => 'Speed',            'weight' => 25, 'max' => 45, 'lost' => 0, 'findings' => []],
+		'mobile'  => ['label' => 'Phone experience', 'weight' => 20, 'max' => 38, 'lost' => 0, 'findings' => []],
+		'search'  => ['label' => 'Getting found',    'weight' => 15, 'max' => 50, 'lost' => 0, 'findings' => []],
+		'contact' => ['label' => 'Getting in touch', 'weight' => 16, 'max' => 50, 'lost' => 0, 'findings' => []],
+		'copy'    => ['label' => 'How the writing reads', 'weight' => 12, 'max' => 25, 'lost' => 0, 'findings' => []],
+		'design'  => ['label' => 'How current it looks',  'weight' => 12, 'max' => 20, 'lost' => 0, 'findings' => []],
 	];
 	$add = function (string $cat, string $level, int $cost, string $title, string $detail) use (&$cats) {
 		$cats[$cat]['findings'][] = ['level' => $level, 'title' => $title, 'detail' => $detail];
@@ -726,9 +726,11 @@ function audit_run(string $inputUrl, string $typeOverride = ''): array
 
 	$hasAnalytics = (bool) preg_match('~googletagmanager|google-analytics|gtag\(|fbq\(|plausible|fathom|posthog~i', $html);
 
+	// Reported, never scored. Missing analytics costs the owner visibility,
+	// not customers, and this tool only scores what a visitor actually hits.
 	if (!$hasAnalytics && $siteType !== 'portfolio') {
-		$add('search', 'warn', 5, "Nothing is measuring this site",
-			"No analytics of any kind is installed, so there is no way to tell how many people visit, what they look at, or whether anything you change actually helps. You are flying blind.");
+		$add('search', 'good', 0, "No analytics installed",
+			"Worth adding, though it does not affect visitors. Without it there is no way to tell whether a change helped, so this is not counted against the score.");
 	} elseif ($hasAnalytics) {
 		$add('search', 'good', 0, "Traffic is being measured", "Analytics is installed, so the site's performance is visible.");
 	}
@@ -737,7 +739,7 @@ function audit_run(string $inputUrl, string $typeOverride = ''): array
 	$categories = [];
 	$score = 0;
 	foreach ($cats as $key => $c) {
-		$pct = max(0, 100 - min(100, $c['lost'] * 100 / max(1, $c['weight'])));
+		$pct = max(0, 100 - min(100, $c['lost'] * 100 / max(1, $c['max'])));
 		$earned = $c['weight'] * $pct / 100;
 		$score += $earned;
 		usort($c['findings'], function ($a, $b) {
