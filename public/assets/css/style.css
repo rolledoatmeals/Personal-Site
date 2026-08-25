@@ -312,8 +312,15 @@ section {
 	transition: transform .24s ease
 }
 
-.nav-links a:hover::after {
+.nav-links a:hover::after,
+.nav-links a.active::after {
 	transform: scaleX(1)
+}
+
+/* The section you are actually in stays lit, so the underline reads as
+   position rather than just hover feedback. */
+.nav-links a.active {
+	color: var(--white)
 }
 
 .hamburger {
@@ -945,8 +952,15 @@ section {
 	transition: transform .24s ease
 }
 
-.nav-links a:hover::after {
+.nav-links a:hover::after,
+.nav-links a.active::after {
 	transform: scaleX(1)
+}
+
+/* The section you are actually in stays lit, so the underline reads as
+   position rather than just hover feedback. */
+.nav-links a.active {
+	color: var(--white)
 }
 
 /* header and footer tweaks */
@@ -1556,7 +1570,9 @@ body.loaded .hero-links {
 	color: var(--muted);
 	font-size: .98rem;
 	max-width: 46rem;
-	margin: 0 0 2.2rem
+	/* auto side margins: the box is narrower than the container, so without
+	   these it hugs the left edge while its text centers inside it. */
+	margin: 0 auto 2.2rem
 }
 .work-grid {
 	text-align: left;

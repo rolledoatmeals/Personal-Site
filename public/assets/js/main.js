@@ -35,6 +35,17 @@
 		});
 	}
 
+	// Sections are full-height with their content vertically centred, so
+	// scrolling to a section's top edge leaves up to 300px of dead space above
+	// the heading. Aim at the heading instead and tuck it under the nav.
+	function sectionScrollTop(target) {
+		const nav = document.querySelector('.site-nav');
+		const navH = nav ? nav.getBoundingClientRect().height : 0;
+		const anchor = target.querySelector('h2, .about-heading, h1') || target;
+		const y = window.scrollY + anchor.getBoundingClientRect().top - navH - 28;
+		return Math.max(0, Math.round(y));
+	}
+
 	function setupAnchorScroll() {
 		document.body.addEventListener('click', function (e) {
 			const link = e.target.closest('a[data-scroll]');
@@ -44,8 +55,52 @@
 			if (!target) return;
 
 			e.preventDefault();
-			target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			window.scrollTo({ top: sectionScrollTop(target), behavior: 'smooth' });
 		});
+	}
+
+	function setupScrollSpy() {
+		const links = Array.from(document.querySelectorAll('a[data-scroll]'));
+		if (!links.length) return;
+
+		// Desktop and mobile menus repeat the same ids, and nav order does not
+		// match page order, so dedupe and sort by where sections actually sit.
+		const ids = links.map(function (a) { return a.dataset.scroll; })
+			.filter(function (id, i, all) { return all.indexOf(id) === i; });
+		const sections = ids.map(function (id) {
+			return { id: id, el: document.getElementById(id) };
+		}).filter(function (s) { return s.el; })
+			.sort(function (a, b) { return a.el.offsetTop - b.el.offsetTop; });
+		if (!sections.length) return;
+
+		let ticking = false;
+
+		function mark() {
+			// Read a third of the way down the screen: a section counts as current
+			// once it owns most of the view, not the instant its top edge appears.
+			const line = window.scrollY + window.innerHeight * 0.34;
+			const atBottom = window.scrollY + window.innerHeight >=
+				document.documentElement.scrollHeight - 4;
+
+			let currentId = null;
+			sections.forEach(function (s) {
+				if (s.el.offsetTop <= line) currentId = s.id;
+			});
+			if (atBottom) currentId = sections[sections.length - 1].id;
+
+			links.forEach(function (a) {
+				a.classList.toggle('active', a.dataset.scroll === currentId);
+			});
+		}
+
+		window.addEventListener('scroll', function () {
+			if (ticking) return;
+			ticking = true;
+			window.requestAnimationFrame(function () { mark(); ticking = false; });
+		}, { passive: true });
+
+		window.addEventListener('resize', mark, { passive: true });
+		mark();
 	}
 
 	function setupMobileNav() {
@@ -214,6 +269,7 @@
 	onReady(function () {
 		setupLoader();
 		setupAnchorScroll();
+		setupScrollSpy();
 		setupBackToTop();
 		setupMobileNav();
 		setupNavScrollState();
