@@ -132,6 +132,9 @@ video {
 html {
 	height: 100%;
 	scroll-behavior: smooth;
+	/* .site-nav is fixed and ~63px tall, so anchor jumps land under it
+	   without this offset. */
+	scroll-padding-top: 5rem;
 }
 
 body {
@@ -163,6 +166,12 @@ section {
 	justify-content: center;
 	text-align: center;
 	padding: 5.5rem 0;
+	/* Every section fills the screen. min-height, not height: Work and About
+	   run longer than one screen and must be allowed to grow instead of
+	   clipping. svh is the viewport with mobile browser chrome showing, so
+	   nothing hides under the URL bar. */
+	min-height: 100vh;
+	min-height: 100svh;
 }
 
 .container {
@@ -1465,7 +1474,8 @@ body.loaded .hero-links {
 	}
 
 	section {
-		min-height: unset;
+		min-height: 100vh;
+		min-height: 100svh;
 		padding: 3rem 0;
 	}
 
@@ -1817,4 +1827,96 @@ body.loaded .hero-links {
 	.cmp-row { grid-template-columns: 1fr; gap: .35rem }
 	.cmp-label { text-align: left; min-width: 0 }
 	.cmp-side:first-child { flex-direction: row }
+}
+
+
+/* ---------- Phone refinements ---------- */
+@media (max-width: 640px) {
+	/* Touch targets: 44px is the minimum a thumb reliably hits. These were
+	   17-40px, which is fine for a cursor and frustrating on a phone. */
+	.back-to-top {
+		min-width: 44px;
+		min-height: 44px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.social-link {
+		min-width: 44px;
+		min-height: 44px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.work-link,
+	.contact-actions a {
+		min-height: 44px;
+		display: inline-flex;
+		align-items: center;
+	}
+
+	/* The footer links sit inline either side of a middot, so a min-height
+	   would break the line. Vertical padding grows the tap area instead. */
+	.footer-inner a {
+		display: inline-block;
+		padding: .65rem 0;
+	}
+
+	/* Overrides the centering set at max-width:1024px. Centered text is fine
+	   for a few words and hard to read over a long paragraph, because every
+	   line starts in a different place. Phone widths only; the tablet
+	   centering above is left alone. */
+	.about-text > p,
+	.about-text p {
+		text-align: left;
+		text-wrap: pretty;
+	}
+}
+
+
+/* The stagger index used to come from an inline style attribute on each card,
+   which the Content Security Policy blocks (style-src has no 'unsafe-inline').
+   Setting it here keeps the staggered reveal and clears the console. Cards
+   past the 12th fall back to the 0 default below. */
+.work-card { --i: 0 }
+	.work-card:nth-child(1) { --i: 0 }
+	.work-card:nth-child(2) { --i: 1 }
+	.work-card:nth-child(3) { --i: 2 }
+	.work-card:nth-child(4) { --i: 3 }
+	.work-card:nth-child(5) { --i: 4 }
+	.work-card:nth-child(6) { --i: 5 }
+	.work-card:nth-child(7) { --i: 6 }
+	.work-card:nth-child(8) { --i: 7 }
+	.work-card:nth-child(9) { --i: 8 }
+	.work-card:nth-child(10) { --i: 9 }
+	.work-card:nth-child(11) { --i: 10 }
+	.work-card:nth-child(12) { --i: 11 }
+
+
+/* ---------- Work fits one laptop screen ----------
+   Six cards in 3x2. The blurbs were shortened in index.php; this trims the
+   surrounding chrome so the whole section lands inside 900px of viewport.
+   Scoped to laptop widths so phone sizing stays comfortable. */
+@media (min-width: 1024px) {
+	.work { padding: 4rem 0 3rem }
+	.work-intro { margin-bottom: 1.3rem }
+	.work-grid { gap: 1rem }
+	.work-card { padding: 1.15rem 1.2rem 1rem }
+	.work-title { font-size: 1.18rem }
+	.work-stat { font-size: 1.12rem }
+	.work-blurb { font-size: .88rem; line-height: 1.55 }
+	.work-tags li { font-size: .74rem }
+}
+
+
+/* Shorter laptop screens (1280x800 and similar) need another ~80px trimmed.
+   Keyed to viewport height so tall displays keep the roomier spacing above. */
+@media (min-width: 1024px) and (max-height: 860px) {
+	.work { padding: 2.25rem 0 1.75rem }
+	.work-intro { margin-bottom: .9rem; font-size: .92rem }
+	.work-grid { gap: .85rem }
+	.work-card { padding: 1rem 1.05rem .9rem }
+	.work-blurb { font-size: .85rem; line-height: 1.5 }
 }

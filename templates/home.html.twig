@@ -29,7 +29,7 @@
         <p class="work-intro">Systems I have built and shipped, and what each one actually fixed.</p>
         <div class="work-grid">
 {% for w in work %}
-          <article class="work-card" style="--i: {{ loop.index0 }}">
+          <article class="work-card">
             <div class="work-head">
               <h3 class="work-title">{{ w.title }}</h3>
               {% if w.url %}<a class="work-link" href="{{ w.url }}" target="_blank" rel="noopener" aria-label="Visit {{ w.title }}">Visit &#8599;</a>{% endif %}
