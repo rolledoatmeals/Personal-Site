@@ -33,10 +33,12 @@
 
   <link rel="preload" href="/assets/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/syne-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/assets/css/style.css?v=4">
+  <link rel="stylesheet" href="/assets/css/style.css?v={{ asset_version|default('1') }}">
 
-  <!-- simple SVG favicon -->
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230a0f1e'/%3E%3Ctext x='50' y='57' font-size='48' fill='%23fff' text-anchor='middle' font-family='Syne, Arial, sans-serif'%3EZS%3C/text%3E%3C/svg%3E">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
 {% if seo.json_ld is defined %}
   <script type="application/ld+json" nonce="{{ nonce }}">{{ seo.json_ld|raw }}</script>
 {% endif %}
@@ -47,7 +49,7 @@
 {% block content %}{% endblock %}
   </div>
 
-  <script src="/assets/js/main.js?v=3" defer nonce="{{ nonce }}"></script>
+  <script src="/assets/js/main.js?v={{ asset_version|default('1') }}" defer nonce="{{ nonce }}"></script>
 </body>
 </html>
 

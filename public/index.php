@@ -40,6 +40,42 @@ if (!headers_sent()) {
 
 $nonce = base64_encode(random_bytes(16));
 
+// Cache-bust assets on content change rather than a hand-edited number.
+$assetVersion = (string) max(
+	(int) @filemtime(__DIR__ . '/assets/css/style.css'),
+	(int) @filemtime(__DIR__ . '/assets/js/main.js')
+);
+
+/**
+ * Same headers on every route. Styles carry the nonce because the audit
+ * page writes a few dynamic rules (progress widths, the score ring) that
+ * cannot be known ahead of time.
+ */
+function audit_security_headers(string $nonce): void
+{
+	if (headers_sent()) {
+		return;
+	}
+	$csp = implode('; ', [
+		"default-src 'self'",
+		"script-src 'self' 'nonce-{$nonce}'",
+		"style-src 'self' 'nonce-{$nonce}'",
+		"font-src 'self'",
+		"img-src 'self' data:",
+		"connect-src 'self'",
+		"object-src 'none'",
+		"base-uri 'self'",
+		"frame-ancestors 'none'",
+		"form-action 'self'",
+	]);
+	header("Content-Security-Policy: {$csp}");
+	header('X-Frame-Options: DENY');
+	header('X-Content-Type-Options: nosniff');
+	header('Referrer-Policy: strict-origin-when-cross-origin');
+	header('Permissions-Policy: geolocation=(), microphone=(), camera=()');
+}
+
+
 $requestPath = parse_url($requestUri, PHP_URL_PATH) ?: '/';
 
 if ($requestPath === '/api/audit') {
@@ -63,6 +99,7 @@ if ($requestPath === '/api/audit') {
 
 
 $data = [
+	'asset_version' => $assetVersion,
 	'site' => [
 		'title' => $siteTitle,
 		'tagline' => $siteTagline,
@@ -189,14 +226,6 @@ $data = [
 			'tags' => ['Booking flow', 'Performance', 'Conversion'],
 			'url' => '',
 		],
-		[
-			'title' => 'Lender systems audit',
-			'stat' => '3 critical finds, day one',
-			'context' => 'Commercial real estate lender',
-			'blurb' => 'Went through the website and CRM before quoting anything. Found borrower financial documents sitting publicly readable, form submissions silently failing to reach the CRM, and an ad account that had never once recorded a conversion. Scoped the rebuild in phases from there.',
-			'tags' => ['Technical audit', 'Security review', 'CRM'],
-			'url' => '',
-		],
 	],
 	'skills' => [
 		['name' => 'Salesforce',   'desc' => 'Flows, Apex, CLI deploys, reports and dashboards'],
@@ -229,24 +258,17 @@ if (($requestPath ?? parse_url($requestUri, PHP_URL_PATH)) === '/audit') {
 	$data['seo']['description'] = 'Paste a website address and get a plain-English report on speed, mobile usability, and search visibility in about ten seconds.';
 	$data['seo']['canonical_url'] = 'https://zacharyshep.com/audit';
 	unset($data['seo']['json_ld']);
+	$data['nonce'] = $nonce;
+	audit_security_headers($nonce);
 	echo $twig->render('audit.html.twig', $data);
 	exit;
 }
 
 $output = $twig->render('home.html.twig', $data);
 
-if (!headers_sent()) {
-	$csp = implode('; ', [
-		"default-src 'self'",
-		"script-src 'self' 'nonce-{$nonce}'",
-		"style-src 'self'",
-		"font-src 'self'",
-		"img-src 'self' data:",
-		"object-src 'none'",
-		"base-uri 'self'",
-		"frame-ancestors 'none'",
-		"form-action 'self'",
-	]);
+audit_security_headers($nonce);
+if (false) {
+	$csp = '';
 	header("Content-Security-Policy: {$csp}");
 	header('X-Frame-Options: DENY');
 	header('X-Content-Type-Options: nosniff');

@@ -29,14 +29,18 @@
               <div class="audit-score" id="audit-score">0</div>
             </div>
             <div class="audit-meta">
+              <p class="audit-headline" id="audit-headline"></p>
               <p id="audit-checked" class="audit-checked"></p>
-              <p id="audit-platform" class="audit-platform"></p>
+              <p id="audit-chips" class="audit-chips"></p>
             </div>
           </div>
-          <ul id="audit-findings" class="audit-findings"></ul>
+          <div id="audit-cats" class="audit-cats"></div>
           <div class="audit-cta">
-            <p>Want these fixed, or a deeper look at what the automated pass can't see?</p>
-            <a class="btn btn-primary" href="mailto:{{ contact.email }}?subject=Website%20audit%20follow-up">Email me the report</a>
+            <p>Keep this report, or send it to whoever owns the site.</p>
+            <div class="audit-cta-actions">
+              <button type="button" class="btn btn-primary" id="audit-download">Save as PDF</button>
+              <button type="button" class="btn btn-ghost" id="audit-copy">Copy as text</button>
+            </div>
           </div>
         </div>
       </div>
@@ -45,8 +49,12 @@
 
 {% include 'partials/footer.html.twig' %}
 
+<style nonce="{{ nonce }}" id="audit-dyn"></style>
 <script nonce="{{ nonce }}">
 (function () {
+	var dyn = document.getElementById('audit-dyn');
+	function setRules(css) { dyn.textContent = css; }
+
 	var form = document.getElementById('audit-form');
 	var input = document.getElementById('audit-url');
 	var status = document.getElementById('audit-status');
@@ -80,28 +88,88 @@
 		var scoreEl = document.getElementById('audit-score');
 		var ring = document.getElementById('audit-ring-fg');
 		var C = 2 * Math.PI * 52;
-		ring.style.strokeDasharray = C;
-		ring.style.strokeDashoffset = C;
-		ring.className.baseVal = 'audit-ring-fg ' + (score >= 80 ? 'is-good' : score >= 55 ? 'is-warn' : 'is-bad');
-		document.getElementById('audit-checked').textContent = data.url + ' · ' + data.page_kb + ' KB · ' + data.seconds + 's';
-		document.getElementById('audit-platform').textContent = 'Built on: ' + data.platform;
+		var band = score >= 85 ? 'is-good' : score >= 60 ? 'is-warn' : 'is-bad';
+		ring.setAttribute('class', 'audit-ring-fg ' + band);
+		var rules = ['.audit-ring-fg{stroke-dasharray:' + C + ';stroke-dashoffset:' + C + '}'];
 
-		var list = document.getElementById('audit-findings');
-		list.innerHTML = '';
-		data.findings.forEach(function (f, i) {
-			var li = document.createElement('li');
-			li.className = 'audit-finding is-' + f.level;
-			li.style.transitionDelay = (i * 70) + 'ms';
-			var t = document.createElement('strong'); t.textContent = f.title;
-			var d = document.createElement('p'); d.textContent = f.detail;
-			li.appendChild(t); li.appendChild(d);
-			list.appendChild(li);
+		document.getElementById('audit-headline').textContent = data.headline;
+		document.getElementById('audit-checked').textContent = data.url;
+
+		var chips = document.getElementById('audit-chips');
+		chips.innerHTML = '';
+		[
+			data.platform,
+			data.page_kb + ' KB',
+			data.seconds + 's',
+			data.https ? 'HTTPS' : 'No HTTPS',
+			data.analytics ? 'Tracking on' : 'No tracking',
+			data.js_rendered ? 'JavaScript-rendered' : null
+		].filter(Boolean).forEach(function (t) {
+			var c = document.createElement('span');
+			c.className = 'audit-chip';
+			c.textContent = t;
+			chips.appendChild(c);
 		});
+
+		var wrap = document.getElementById('audit-cats');
+		wrap.innerHTML = '';
+		var delay = 0;
+		data.categories.forEach(function (cat) {
+			var sec = document.createElement('section');
+			sec.className = 'audit-cat';
+
+			var head = document.createElement('div');
+			head.className = 'audit-cat-head';
+			var h = document.createElement('h2');
+			h.textContent = cat.label;
+			var pct = document.createElement('span');
+			pct.className = 'audit-cat-pct ' + (cat.pct >= 85 ? 'is-good' : cat.pct >= 60 ? 'is-warn' : 'is-bad');
+			pct.textContent = cat.pct + '%';
+			head.appendChild(h);
+			head.appendChild(pct);
+
+			var bar = document.createElement('div');
+			bar.className = 'audit-bar';
+			var fill = document.createElement('i');
+			fill.className = 'audit-bar-fill ' + (cat.pct >= 85 ? 'is-good' : cat.pct >= 60 ? 'is-warn' : 'is-bad');
+			fill.setAttribute('data-cat', cat.key);
+			bar.appendChild(fill);
+
+			var list = document.createElement('ul');
+			list.className = 'audit-findings';
+			cat.findings.forEach(function (f) {
+				var li = document.createElement('li');
+				li.className = 'audit-finding is-' + f.level;
+				li.setAttribute('data-d', String(delay += 55));
+				var t = document.createElement('strong');
+				t.textContent = f.title;
+				var d = document.createElement('p');
+				d.textContent = f.detail;
+				li.appendChild(t);
+				li.appendChild(d);
+				list.appendChild(li);
+			});
+
+			sec.appendChild(head);
+			sec.appendChild(bar);
+			sec.appendChild(list);
+			wrap.appendChild(sec);
+		});
+
+		data.categories.forEach(function (c) {
+			rules.push('.audit-bar-fill[data-cat="' + c.key + '"]{width:' + c.pct + '%}');
+		});
+		for (var d = 55; d <= delay; d += 55) {
+			rules.push('.audit-finding[data-d="' + d + '"]{transition-delay:' + d + 'ms}');
+		}
+		setRules(rules.join(''));
+
+		lastReport = data;
 
 		result.hidden = false;
 		requestAnimationFrame(function () {
 			requestAnimationFrame(function () {
-				ring.style.strokeDashoffset = String(C * (1 - score / 100));
+				setRules(rules.join('') + '.audit-ring-fg{stroke-dasharray:' + C + ';stroke-dashoffset:' + (C * (1 - score / 100)) + '}');
 				var n = 0;
 				var step = Math.max(1, Math.round(score / 40));
 				var timer = setInterval(function () {
@@ -109,10 +177,154 @@
 					scoreEl.textContent = n;
 					if (n >= score) clearInterval(timer);
 				}, 24);
-				list.classList.add('in');
+				wrap.querySelectorAll('.audit-findings').forEach(function (l) { l.classList.add('in'); });
 			});
 		});
 	}
+
+	var lastReport = null;
+
+	function reportText(d) {
+		var L = [];
+		L.push('WEBSITE AUDIT');
+		L.push(d.url);
+		L.push(new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }));
+		L.push('');
+		L.push('SCORE: ' + d.score + ' / 100');
+		L.push(d.headline);
+		L.push('');
+		L.push('Platform: ' + d.platform);
+		L.push('Page weight: ' + d.page_kb + ' KB (' + d.html_kb + ' KB of that is HTML)');
+		L.push('Server response: ' + d.seconds + 's');
+		L.push('Secure (HTTPS): ' + (d.https ? 'yes' : 'no'));
+		L.push('Analytics installed: ' + (d.analytics ? 'yes' : 'no'));
+		if (d.js_rendered) L.push('Note: this page renders with JavaScript, so some checks are limited.');
+		L.push('');
+		d.categories.forEach(function (c) {
+			L.push('--------------------------------------------');
+			L.push(c.label.toUpperCase() + ' - ' + c.pct + '%');
+			L.push('');
+			c.findings.forEach(function (f) {
+				var mark = f.level === 'bad' ? '[!]' : f.level === 'warn' ? '[~]' : '[ok]';
+				L.push(mark + ' ' + f.title);
+				L.push('    ' + f.detail);
+				L.push('');
+			});
+		});
+		L.push('--------------------------------------------');
+		L.push('Audited with the free tool at zacharyshep.com/audit');
+		L.push('Questions, or want these fixed: {{ contact.email }}');
+		return L.join('\n');
+	}
+
+	function slug(u) {
+		return u.replace(/^https?:\/\//, '').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').slice(0, 50);
+	}
+
+	function esc(t) {
+		return String(t).replace(/[&<>"']/g, function (c) {
+			return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+		});
+	}
+
+	function reportHtml(d) {
+		var when = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+		var band = d.score >= 85 ? '#0f9b4a' : d.score >= 60 ? '#b8860b' : '#c0392b';
+		var cats = d.categories.map(function (c) {
+			var items = c.findings.map(function (f) {
+				var mark = f.level === 'bad' ? '&#10007;' : f.level === 'warn' ? '!' : '&#10003;';
+				var col = f.level === 'bad' ? '#c0392b' : f.level === 'warn' ? '#b8860b' : '#0f9b4a';
+				return '<li class="f"><span class="m" style="color:' + col + '">' + mark + '</span>' +
+					'<div><strong>' + esc(f.title) + '</strong><p>' + esc(f.detail) + '</p></div></li>';
+			}).join('');
+			var cbar = c.pct >= 85 ? '#0f9b4a' : c.pct >= 60 ? '#b8860b' : '#c0392b';
+			return '<section class="cat"><div class="ch"><h2>' + esc(c.label) + '</h2>' +
+				'<span class="pct" style="color:' + cbar + '">' + c.pct + '%</span></div>' +
+				'<div class="bar"><i style="width:' + c.pct + '%;background:' + cbar + '"></i></div>' +
+				'<ul>' + items + '</ul></section>';
+		}).join('');
+
+		return '<!doctype html><html><head><meta charset="utf-8"><title>Website audit ' + esc(d.url) + '</title><style>' +
+			'@page{size:letter;margin:.6in}' +
+			'*{box-sizing:border-box}' +
+			'body{font:11pt/1.5 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#16202e;margin:0}' +
+			'header{border-bottom:3px solid #0f2440;padding-bottom:14px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-start;gap:20px}' +
+			'h1{font-size:19pt;margin:0 0 4px}' +
+			'.url{font:10pt ui-monospace,SFMono-Regular,Menlo,monospace;color:#4a5568;word-break:break-all}' +
+			'.when{font-size:9pt;color:#7b8794;margin-top:3px}' +
+			'.scorebox{text-align:center;flex:0 0 auto;border:3px solid ' + band + ';border-radius:12px;padding:10px 16px}' +
+			'.scorebox b{display:block;font-size:26pt;line-height:1;color:' + band + '}' +
+			'.scorebox span{font-size:8pt;letter-spacing:.1em;text-transform:uppercase;color:#7b8794}' +
+			'.headline{font-size:12.5pt;font-weight:600;margin:0 0 14px}' +
+			'.meta{font-size:9.5pt;color:#4a5568;margin:0 0 22px;padding:10px 12px;background:#f4f6f8;border-radius:8px}' +
+			'.meta span{display:inline-block;margin-right:14px}' +
+			'.cat{margin-bottom:20px;page-break-inside:avoid}' +
+			'.ch{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid #dde3ea;padding-bottom:4px;margin-bottom:7px}' +
+			'.ch h2{font-size:11.5pt;margin:0}' +
+			'.pct{font:10pt ui-monospace,Menlo,monospace}' +
+			'.bar{height:5px;background:#e6ebf1;border-radius:9px;overflow:hidden;margin-bottom:10px}' +
+			'.bar i{display:block;height:100%;border-radius:9px}' +
+			'ul{list-style:none;margin:0;padding:0}' +
+			'.f{display:flex;gap:9px;margin-bottom:9px;page-break-inside:avoid}' +
+			'.m{font-weight:700;flex:0 0 14px;text-align:center}' +
+			'.f strong{display:block;font-size:10.5pt;margin-bottom:2px}' +
+			'.f p{margin:0;font-size:9.5pt;color:#4a5568;line-height:1.45}' +
+			'footer{margin-top:26px;padding-top:12px;border-top:1px solid #dde3ea;font-size:9pt;color:#7b8794}' +
+			'</style></head><body>' +
+			'<header><div><h1>Website Audit</h1><div class="url">' + esc(d.url) + '</div><div class="when">' + when + '</div></div>' +
+			'<div class="scorebox"><b>' + d.score + '</b><span>out of 100</span></div></header>' +
+			'<p class="headline">' + esc(d.headline) + '</p>' +
+			'<p class="meta"><span><strong>Platform:</strong> ' + esc(d.platform) + '</span>' +
+			'<span><strong>Weight:</strong> ' + d.page_kb + ' KB</span>' +
+			'<span><strong>Response:</strong> ' + d.seconds + 's</span>' +
+			'<span><strong>HTTPS:</strong> ' + (d.https ? 'yes' : 'no') + '</span>' +
+			'<span><strong>Analytics:</strong> ' + (d.analytics ? 'yes' : 'no') + '</span>' +
+			(d.js_rendered ? '<span><strong>Note:</strong> renders with JavaScript</span>' : '') + '</p>' +
+			cats +
+			'<footer>Audited with the free tool at zacharyshep.com/audit &nbsp;&middot;&nbsp; Questions, or want these fixed: {{ contact.email }}</footer>' +
+			'</body></html>';
+	}
+
+	document.getElementById('audit-download').addEventListener('click', function () {
+		if (!lastReport) return;
+		var w = window.open('', '_blank');
+		if (!w) {
+			status.textContent = 'Allow pop-ups for this site to open the report.';
+			return;
+		}
+		w.document.open();
+		w.document.write(reportHtml(lastReport));
+		w.document.close();
+		w.focus();
+		setTimeout(function () { w.print(); }, 400);
+	});
+
+	document.getElementById('audit-copy').addEventListener('click', function () {
+		if (!lastReport) return;
+		var btn = this;
+		var text = reportText(lastReport);
+		var done = function () {
+			var was = btn.textContent;
+			btn.textContent = 'Copied';
+			setTimeout(function () { btn.textContent = was; }, 1600);
+		};
+		if (navigator.clipboard && window.isSecureContext) {
+			navigator.clipboard.writeText(text).then(done, function () { fallback(text, done); });
+		} else {
+			fallback(text, done);
+		}
+	});
+
+	function fallback(text, done) {
+		var ta = document.createElement('textarea');
+		ta.value = text;
+		ta.className = 'audit-offscreen';
+		document.body.appendChild(ta);
+		ta.select();
+		try { document.execCommand('copy'); done(); } catch (e) {}
+		document.body.removeChild(ta);
+	}
+
 })();
 </script>
 {% endblock %}

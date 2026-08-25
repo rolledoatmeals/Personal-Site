@@ -1729,3 +1729,39 @@ body.loaded .hero-links {
 	.audit-result { text-align: left }
 	.audit-cta { justify-content: center; text-align: center }
 }
+.audit-cta-actions { display: flex; gap: .7rem; flex-wrap: wrap }
+.audit-headline { font-family: var(--font-heading); font-size: 1.15rem; color: var(--white); margin: 0 0 .4rem; line-height: 1.3 }
+.audit-chips { display: flex; flex-wrap: wrap; gap: .4rem; margin: .6rem 0 0 }
+.audit-chip {
+	font-family: var(--font-mono); font-size: .74rem; color: #b9c2d6;
+	background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
+	padding: .2rem .55rem; border-radius: 100px;
+}
+.audit-cats { display: flex; flex-direction: column; gap: 1.6rem }
+.audit-cat-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: .5rem }
+.audit-cat-head h2 { font-family: var(--font-heading); font-size: 1.05rem; margin: 0; color: var(--white) }
+.audit-cat-pct { font-family: var(--font-mono); font-size: .85rem }
+.audit-cat-pct.is-good { color: var(--accent) }
+.audit-cat-pct.is-warn { color: #ffd166 }
+.audit-cat-pct.is-bad { color: #ff6b6b }
+.audit-bar { height: 5px; border-radius: 100px; background: rgba(255,255,255,.07); overflow: hidden; margin-bottom: .9rem }
+.audit-bar-fill { display: block; height: 100%; width: 0; border-radius: 100px; transition: width .9s cubic-bezier(.22,1,.36,1) }
+.audit-bar-fill.is-good { background: var(--accent) }
+.audit-bar-fill.is-warn { background: #ffd166 }
+.audit-bar-fill.is-bad { background: #ff6b6b }
+.audit-offscreen { position: fixed; opacity: 0; pointer-events: none; top: -9999px }
+
+/* Category blocks are <section> elements, so the global section rule turns
+   them into centered flex rows. Reset them to normal document flow. */
+.audit-cat {
+	display: block;
+	min-height: 0;
+	padding: 0;
+	text-align: left;
+}
+.audit-inner { text-align: center }
+.audit-result,
+.audit-result * { text-align: left }
+.audit-result .audit-cta { text-align: left }
+.audit-finding strong,
+.audit-finding p { text-align: left }
