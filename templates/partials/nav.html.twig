@@ -7,7 +7,7 @@
       <nav class="nav-links" role="navigation" aria-label="Primary">
         <ul>
 {% for item in nav %}
-          <li><a href="#" data-scroll="{{ item.scroll }}">{{ item.label }}</a></li>
+          <li><a href="#{{ item.scroll }}" data-scroll="{{ item.scroll }}">{{ item.label }}</a></li>
 {% endfor %}
         </ul>
       </nav>
@@ -22,7 +22,7 @@
     <div id="mobile-menu" class="mobile-menu">
       <ul>
 {% for item in nav %}
-        <li><a href="#" data-scroll="{{ item.scroll }}">{{ item.label }}</a></li>
+        <li><a href="#{{ item.scroll }}" data-scroll="{{ item.scroll }}">{{ item.label }}</a></li>
 {% endfor %}
       </ul>
     </div>

@@ -114,6 +114,7 @@ video {
 /* Tokens */
 :root {
 	--font-body: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+	--font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, monospace;
 	--font-heading: 'Syne', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 	--bg: #0a0f1e;
 	--accent: #00e676;
@@ -157,12 +158,11 @@ main {
 }
 
 section {
-	min-height: 100vh;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	text-align: center;
-	padding: 6rem 0;
+	padding: 5.5rem 0;
 }
 
 .container {
@@ -382,7 +382,8 @@ section {
 }
 
 .hero-sub {
-	color: var(--muted);
+	color: var(--white);
+	font-size: 1.2rem;
 	margin-top: 1rem;
 	max-width: 60ch;
 	text-wrap: balance;
@@ -393,7 +394,6 @@ section {
 	margin-top: .75rem;
 	max-width: 52ch;
 	font-size: 1rem;
-	opacity: .75;
 	line-height: 1.7;
 	text-wrap: balance;
 }
@@ -456,7 +456,7 @@ section {
 
 .skills-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 	gap: 1rem;
 	margin-top: 1.25rem
 }
@@ -736,7 +736,6 @@ section {
 	position: relative;
 	overflow: hidden;
 	transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
-	animation: float 6s ease-in-out infinite;
 	transform-style: preserve-3d
 }
 
@@ -899,7 +898,9 @@ section {
 }
 
 .btn-ghost {
-	background: transparent;
+	background: transparent !important;
+	color: var(--white) !important;
+	border: 1px solid rgba(255,255,255,.35);
 	color: var(--white);
 	border: 1px solid rgba(255, 255, 255, .06)
 }
@@ -1008,10 +1009,7 @@ html {
 	min-height: 100vh
 }
 
-.hero h1 {
-	font-size: clamp(1.8rem, 4vw, 3.4rem);
-	margin: 0
-}
+
 
 .tagline {
 	color: #444;
@@ -1149,8 +1147,7 @@ html {
 	transition: transform .32s cubic-bezier(.34, 1.56, .64, 1);
 	cursor: default;
 	will-change: transform, filter;
-	animation: color-spin-idle 5s linear infinite
-}
+	}
 
 .hero-title .char-sp {
 	display: inline
@@ -1518,6 +1515,23 @@ body.loaded .hero-links {
 	object-position: center top;
 }
 /* ---------- Work ---------- */
+.hero-title .word { display: inline-block; white-space: nowrap }
+.hero-links { display: flex; align-items: center; justify-content: center; gap: 1.1rem }
+.hero-eyebrow {
+	font-family: var(--font-mono);
+	font-size: .82rem;
+	letter-spacing: .14em;
+	text-transform: uppercase;
+	color: var(--accent);
+	margin: 0 0 .9rem;
+}
+.work-stat {
+	font-family: var(--font-heading);
+	font-size: 1.35rem;
+	font-weight: 700;
+	color: var(--accent);
+	margin: .1rem 0 0;
+}
 .section--work {
 	background: #0c1730;
 	position: relative;
@@ -1535,11 +1549,14 @@ body.loaded .hero-links {
 	margin: 0 0 2.2rem
 }
 .work-grid {
+	text-align: left;
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
 	gap: 1.25rem
 }
 .work-card {
+	opacity: 0;
+	transform: translateY(18px);
 	background: linear-gradient(135deg, rgba(255, 255, 255, .07) 0%, rgba(255, 255, 255, .02) 100%);
 	backdrop-filter: blur(16px);
 	-webkit-backdrop-filter: blur(16px);
@@ -1551,6 +1568,15 @@ body.loaded .hero-links {
 	flex-direction: column;
 	gap: .55rem;
 	transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease
+}
+#work.in-view .work-card {
+	opacity: 1;
+	transform: none;
+	transition: opacity .5s cubic-bezier(.22,1,.36,1), transform .5s cubic-bezier(.22,1,.36,1), border-color .22s ease, box-shadow .22s ease;
+	transition-delay: calc(var(--i, 0) * 90ms), calc(var(--i, 0) * 90ms), 0s, 0s;
+}
+@media (prefers-reduced-motion: reduce) {
+	.work-card { opacity: 1; transform: none; transition: none }
 }
 .work-card:hover {
 	transform: translateY(-4px);
@@ -1565,13 +1591,13 @@ body.loaded .hero-links {
 }
 .work-title {
 	font-family: var(--font-heading);
-	font-size: 1.12rem;
+	font-size: 1.32rem;
 	color: var(--white);
 	margin: 0;
 	line-height: 1.25
 }
 .work-link {
-	font-size: .78rem;
+	font-size: .82rem;
 	color: var(--accent);
 	text-decoration: none;
 	white-space: nowrap;
@@ -1580,7 +1606,8 @@ body.loaded .hero-links {
 }
 .work-link:hover { border-bottom-color: var(--accent) }
 .work-context {
-	font-size: .76rem;
+	font-family: var(--font-mono);
+	font-size: .8rem;
 	letter-spacing: .09em;
 	text-transform: uppercase;
 	color: var(--cyan);
@@ -1601,7 +1628,8 @@ body.loaded .hero-links {
 	padding: 0
 }
 .work-tags li {
-	font-size: .72rem;
+	font-family: var(--font-mono);
+	font-size: .8rem;
 	letter-spacing: .03em;
 	color: #b9c2d6;
 	background: rgba(255, 255, 255, .05);

@@ -97,10 +97,11 @@
 		if (!el) return;
 		var text = el.textContent;
 
-		el.innerHTML = text.split('').map(function (ch) {
-			if (ch === ' ') return '&nbsp;';
-			return '<span class="char">' + ch + '</span>';
-		}).join('');
+		el.innerHTML = text.split(' ').map(function (word) {
+			return '<span class="word">' + word.split('').map(function (ch) {
+				return '<span class="char">' + ch + '</span>';
+			}).join('') + '</span>';
+		}).join('<span class="char">&nbsp;</span>');
 
 		var rect = el.getBoundingClientRect();
 		var totalW = rect.width || 1;
@@ -224,3 +225,22 @@
 	});
 })();
 
+
+
+// Reveal the Work grid with a stagger the first time it scrolls into view.
+(function () {
+	const work = document.getElementById('work');
+	if (!work || !('IntersectionObserver' in window)) {
+		if (work) work.classList.add('in-view');
+		return;
+	}
+	const io = new IntersectionObserver((entries) => {
+		entries.forEach((entry) => {
+			if (entry.isIntersecting) {
+				work.classList.add('in-view');
+				io.disconnect();
+			}
+		});
+	}, { threshold: 0.15 });
+	io.observe(work);
+})();

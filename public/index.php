@@ -121,6 +121,7 @@ $data = [
 	'work' => [
 		[
 			'title' => 'Salesforce to Align integration',
+			'stat' => 'Daily numbers, zero hands',
 			'context' => 'Industrial staffing company',
 			'blurb' => 'Wired the company system of record into their meeting software so daily operating numbers feed themselves every morning instead of being rebuilt by hand each week. Traced a metric-definition defect that was inflating reported figures and reconciled the feed exactly to the official weekly report.',
 			'tags' => ['Salesforce', 'Apex', 'Scheduled feeds', 'Data integrity'],
@@ -128,6 +129,7 @@ $data = [
 		],
 		[
 			'title' => 'Vendor-to-Salesforce bridge',
+			'stat' => 'No API? Built one anyway',
 			'context' => 'Recruiting pipeline automation',
 			'blurb' => 'The vendor had no export and no API worth the name. Built a scheduled cloud bot that signs in, pulls new applicants and writes them straight into Salesforce, working alongside the vendor engineering team. Also fixed the duplicate-record flow so one person applying to three jobs stays one person.',
 			'tags' => ['GitHub Actions', 'Integration', 'Automation'],
@@ -135,6 +137,7 @@ $data = [
 		],
 		[
 			'title' => 'AI marketing system',
+			'stat' => '5 agents, one-person output',
 			'context' => 'B2B certification company',
 			'blurb' => 'A brand knowledge base plus five purpose-built agents covering email, sales copy, prospect research and campaign collateral. Produces publish-ready work rather than drafts, so the marketing output of a team comes out of one person.',
 			'tags' => ['Claude API', 'Knowledge base', 'Agents'],
@@ -142,6 +145,7 @@ $data = [
 		],
 		[
 			'title' => 'DevSply',
+			'stat' => '5 live client properties',
 			'context' => 'My web and automation studio',
 			'blurb' => 'Client sites designed, built and deployed on Astro, React and WordPress. Five live properties across diesel repair, mens health and e-commerce, plus GoHighLevel CRM systems wired end to end with lead routing, follow-up and conversion tracking.',
 			'tags' => ['Astro', 'React', 'WordPress', 'GoHighLevel'],
@@ -149,6 +153,7 @@ $data = [
 		],
 		[
 			'title' => 'Salon site rebuild',
+			'stat' => 'Sales up 300% YTD',
 			'context' => 'Wig Design by Flora',
 			'blurb' => 'Built the original site, then got brought back two years later to rebuild it end to end. Restructured the architecture and shortened the path to booking an appointment. Sales grew 300 percent year to date after launch.',
 			'tags' => ['Booking flow', 'Performance', 'Conversion'],
@@ -156,6 +161,7 @@ $data = [
 		],
 		[
 			'title' => 'Lender systems audit',
+			'stat' => '3 critical finds, day one',
 			'context' => 'Commercial real estate lender',
 			'blurb' => 'Went through the website and CRM before quoting anything. Found borrower financial documents sitting publicly readable, form submissions silently failing to reach the CRM, and an ad account that had never once recorded a conversion. Scoped the rebuild in phases from there.',
 			'tags' => ['Technical audit', 'Security review', 'CRM'],
