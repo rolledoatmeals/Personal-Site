@@ -16,6 +16,17 @@
           <input id="audit-url" type="text" inputmode="url" placeholder="yourbusiness.com" aria-label="Website address" required>
           <button type="submit" class="btn btn-primary" id="audit-go">Run the audit</button>
         </form>
+        <p class="audit-type-row">
+          <label for="audit-type">Site type</label>
+          <select id="audit-type" aria-label="What kind of site is this">
+            <option value="">Work it out for me</option>
+            <option value="local">Local business</option>
+            <option value="ecommerce">Online store</option>
+            <option value="portfolio">Portfolio or personal</option>
+            <option value="saas">Software or app</option>
+          </select>
+          <span class="audit-type-note">Changes what counts. A missing phone number matters for a shop, not for a portfolio.</span>
+        </p>
 
         <div id="audit-status" class="audit-status" role="status" aria-live="polite"></div>
 
@@ -62,13 +73,15 @@
 	var result = document.getElementById('audit-result');
 	var btn = document.getElementById('audit-go');
 
-	function run(url) {
+	var typeSel = document.getElementById('audit-type');
+
+	function run(url, type) {
 		if (!url) return;
 		btn.disabled = true;
 		result.hidden = true;
 		status.textContent = 'Fetching the page the way a phone would...';
 
-		fetch('/api/audit?url=' + encodeURIComponent(url))
+		fetch('/api/audit?url=' + encodeURIComponent(url) + (type ? '&type=' + encodeURIComponent(type) : ''))
 			.then(function (r) { return r.json(); })
 			.then(function (data) {
 				btn.disabled = false;
@@ -86,17 +99,21 @@
 		e.preventDefault();
 		var url = input.value.trim();
 		if (!url) return;
-		var share = location.pathname + '?url=' + encodeURIComponent(url);
+		var type = typeSel.value;
+		var share = location.pathname + '?url=' + encodeURIComponent(url) + (type ? '&type=' + encodeURIComponent(type) : '');
 		history.replaceState(null, '', share);
-		run(url);
+		run(url, type);
 	});
 
 	// A link like /audit?url=example.com opens with that audit already running,
 	// so a report can be handed to someone as a single link.
-	var preset = new URLSearchParams(location.search).get('url');
+	var params = new URLSearchParams(location.search);
+	var preset = params.get('url');
 	if (preset) {
 		input.value = preset;
-		run(preset);
+		var presetType = params.get('type') || '';
+		if (presetType) typeSel.value = presetType;
+		run(preset, presetType);
 	}
 
 	function render(data) {
@@ -113,6 +130,24 @@
 
 		var chips = document.getElementById('audit-chips');
 		chips.innerHTML = '';
+
+		var typeChip = document.createElement('span');
+		typeChip.className = 'audit-chip is-type';
+		var det = data.detected || {};
+		if (det.auto === false) {
+			typeChip.textContent = 'You picked: ' + data.site_type_label;
+		} else if (det.why && det.why.length) {
+			typeChip.textContent = 'Looks like a ' + data.site_type_label.toLowerCase() + ' — ' + det.why[0];
+		} else {
+			typeChip.textContent = 'Scored as a ' + data.site_type_label.toLowerCase();
+		}
+		typeChip.title = det.auto === false
+			? 'You chose this. Change it above to rescore.'
+			: 'Worked out automatically. Pick a type above if this is wrong.';
+		chips.appendChild(typeChip);
+
+		if (typeSel.value === '') typeSel.value = data.site_type;
+
 		[
 			data.platform,
 			data.page_kb + ' KB',

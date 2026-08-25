@@ -93,7 +93,7 @@ if ($requestPath === '/api/audit') {
 		echo json_encode(['error' => 'Give me a website address to look at.']);
 		exit;
 	}
-	echo json_encode(audit_run($target));
+	echo json_encode(audit_run($target, (string) ($_GET['type'] ?? '')));
 	exit;
 }
 
@@ -264,7 +264,7 @@ $data = [
 if ($requestPath === '/audit/report') {
 	require_once __DIR__ . '/../lib/audit.php';
 	$target = (string) ($_GET['url'] ?? '');
-	$report = $target !== '' && strlen($target) <= 300 ? audit_run($target) : ['error' => 'No website address given.'];
+	$report = $target !== '' && strlen($target) <= 300 ? audit_run($target, (string) ($_GET['type'] ?? '')) : ['error' => 'No website address given.'];
 	if (isset($report['error'])) {
 		http_response_code(400);
 		audit_security_headers($nonce);

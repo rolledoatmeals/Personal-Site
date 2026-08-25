@@ -158,7 +158,106 @@ function audit_weigh(array $urls, int $limit): array
 	return ['total' => $totalKb, 'heaviest' => $heaviest];
 }
 
-function audit_run(string $inputUrl): array
+
+/**
+ * Work out what kind of site this is, because the same finding means
+ * different things depending. A missing phone number is fatal for a body
+ * shop and irrelevant for a portfolio.
+ *
+ * Returns the type, a confidence, and the evidence behind the call so the
+ * visitor can see why and correct it.
+ */
+function audit_detect_type(string $html, string $visible): array
+{
+	$scores = ['local' => 0, 'ecommerce' => 0, 'portfolio' => 0, 'saas' => 0];
+	$why = [];
+
+	// schema.org is the strongest signal when it is present
+	if (preg_match('~"@type"\s*:\s*"(Product|Offer|AggregateOffer)"~i', $html)) {
+		$scores['ecommerce'] += 5; $why[] = 'product schema markup';
+	}
+	if (preg_match('~"@type"\s*:\s*"(LocalBusiness|Restaurant|Store|AutoRepair|Dentist|MedicalBusiness|HealthAndBeautyBusiness|ProfessionalService|HomeAndConstructionBusiness)"~i', $html, $m)) {
+		$scores['local'] += 5; $why[] = $m[1] . ' schema markup';
+	}
+	if (preg_match('~"@type"\s*:\s*"SoftwareApplication"~i', $html)) {
+		$scores['saas'] += 5; $why[] = 'software schema markup';
+	}
+	if (preg_match('~"@type"\s*:\s*"Person"~i', $html) && !preg_match('~"@type"\s*:\s*"(Product|LocalBusiness)"~i', $html)) {
+		$scores['portfolio'] += 3; $why[] = 'person schema markup';
+	}
+
+	// storefront platforms and cart mechanics
+	if (preg_match('~cdn\.shopify\.com|Shopify\.theme|woocommerce|bigcommerce|snipcart|/cart/add~i', $html)) {
+		$scores['ecommerce'] += 4; $why[] = 'a storefront platform';
+	}
+	if (preg_match('~\b(add to cart|add to bag|shopping cart|proceed to checkout|view cart)\b~i', $visible)) {
+		$scores['ecommerce'] += 3; $why[] = 'cart and checkout wording';
+	}
+	if (preg_match('~\$\s?\d{1,3}(?:[.,]\d{2})\b~', $visible) && preg_match('~\b(buy|shop|order)\b~i', $visible)) {
+		$scores['ecommerce'] += 2; $why[] = 'listed prices with buy wording';
+	}
+
+	// signals of a place you visit or call
+	$hasTel = (bool) preg_match('~href=["\']tel:~i', $html);
+	$hasAddr = (bool) preg_match('~\b[A-Z]{2}\s*\d{5}\b~', $html);
+	if ($hasTel && $hasAddr) { $scores['local'] += 3; $why[] = 'a phone number and street address'; }
+	if (preg_match('~google\.com/maps|maps\.google~i', $html)) { $scores['local'] += 2; $why[] = 'an embedded map'; }
+	if (preg_match('~\b(hours|open today|mon(day)?\s*[-–]\s*fri|book (an )?appointment|schedule (a |an )?(visit|appointment|consultation)|walk[- ]ins)\b~i', $visible)) {
+		$scores['local'] += 3; $why[] = 'opening hours or appointment booking';
+	}
+	if (preg_match('~\b(serving|proudly serving|areas we serve|service area)\b~i', $visible)) {
+		$scores['local'] += 2; $why[] = 'a stated service area';
+	}
+
+	// software product signals
+	if (preg_match('~\b(start (your )?free trial|sign up free|get started free|book a demo|request a demo|no credit card required)\b~i', $visible)) {
+		$scores['saas'] += 4; $why[] = 'trial or demo calls to action';
+	}
+	if (preg_match('~\b(per month|/mo\b|per user|pricing plans|billed annually)\b~i', $visible)) {
+		$scores['saas'] += 2; $why[] = 'subscription pricing language';
+	}
+	if (preg_match('~href=["\'][^"\']*\b(login|sign-?in|app\.|dashboard)~i', $html)) {
+		$scores['saas'] += 2; $why[] = 'a login or app link';
+	}
+
+	// personal or portfolio signals
+	if (preg_match('~\b(my portfolio|selected work|my work|case studies|about me|i\'m a |i am a |hire me|resume|curriculum vitae)\b~i', $visible)) {
+		$scores['portfolio'] += 3; $why[] = 'portfolio or personal wording';
+	}
+	if (preg_match('~\b(freelance|available for work|get in touch)\b~i', $visible) && !$hasAddr) {
+		$scores['portfolio'] += 2; $why[] = 'freelance or personal framing';
+	}
+
+	arsort($scores);
+	$top = array_key_first($scores);
+	$topScore = $scores[$top];
+	$second = array_values($scores)[1] ?? 0;
+
+	// Not enough to call it. Default to local business, which is the most
+	// common case for this tool and the strictest ruleset.
+	if ($topScore < 3) {
+		return ['type' => 'local', 'confidence' => 'low', 'why' => [], 'auto' => true];
+	}
+
+	return [
+		'type' => $top,
+		'confidence' => ($topScore >= 5 && $topScore - $second >= 3) ? 'high' : 'medium',
+		'why' => array_slice(array_unique($why), 0, 3),
+		'auto' => true,
+	];
+}
+
+function audit_type_label(string $t): string
+{
+	return [
+		'local' => 'Local business',
+		'ecommerce' => 'Online store',
+		'portfolio' => 'Portfolio or personal site',
+		'saas' => 'Software or app',
+	][$t] ?? 'Local business';
+}
+
+function audit_run(string $inputUrl, string $typeOverride = ''): array
 {
 	$url = trim($inputUrl);
 	if (!preg_match('~^https?://~i', $url)) {
@@ -198,6 +297,32 @@ function audit_run(string $inputUrl): array
 	)));
 	$scriptSrcs = preg_match_all('~<script[^>]*src=~i', $html);
 	$isShell = mb_strlen($visible) < 600 && $scriptSrcs > 0;
+
+	// ---- What kind of site is this?
+	$valid = ['local', 'ecommerce', 'portfolio', 'saas'];
+	$detected = audit_detect_type($html, $visible);
+	if (in_array($typeOverride, $valid, true)) {
+		$siteType = $typeOverride;
+		$detected['auto'] = false;
+	} else {
+		$siteType = $detected['type'];
+	}
+
+	// A missing phone number is fatal for a body shop and irrelevant for a
+	// portfolio, so category weights move with the type.
+	if ($siteType === 'portfolio') {
+		$cats['contact']['weight'] = 8;
+		$cats['search']['weight'] = 12;
+		$cats['design']['weight'] = 18;
+	} elseif ($siteType === 'ecommerce') {
+		$cats['speed']['weight'] = 30;
+		$cats['contact']['weight'] = 12;
+		$cats['search']['weight'] = 18;
+	} elseif ($siteType === 'saas') {
+		$cats['contact']['weight'] = 10;
+		$cats['copy']['weight'] = 16;
+		$cats['design']['weight'] = 16;
+	}
 
 	// ---- SPEED
 	preg_match_all('~<(?:script[^>]+src|link[^>]+href)=["\']([^"\']+\.(?:js|css)[^"\']*)["\']~i', $html, $am);
@@ -340,6 +465,12 @@ function audit_run(string $inputUrl): array
 	if ($isShell) {
 		$add('contact', 'warn', 5, "Couldn't check the phone link",
 			"Because this page renders with JavaScript, an automated pass can't confirm whether tap-to-call exists.");
+	} elseif ($tel === 0 && $siteType === 'portfolio') {
+		$add('contact', 'good', 0, "No phone number, which is fine here",
+			"On a personal site a public phone number mostly invites spam. Email and a form are the right channels.");
+	} elseif ($tel === 0 && $siteType === 'saas') {
+		$add('contact', 'warn', 4, "No phone number",
+			"Optional for software, though buyers evaluating a paid tool often want to reach a human first.");
 	} elseif ($tel === 0) {
 		$add('contact', 'bad', 14, "Nobody can tap to call you",
 			"There's no tap-to-call link on this page. On a phone, every extra step between someone and your number costs you calls.");
@@ -357,7 +488,7 @@ function audit_run(string $inputUrl): array
 	}
 
 	$hasAddress = preg_match('~\b[A-Z]{2}\s*\d{5}\b~', $html) || preg_match('~\d{2,6}\s+[A-Z][A-Za-z.\' ]{2,30}\s+(St|Street|Ave|Avenue|Blvd|Rd|Road|Dr|Drive|Way|Ln|Hwy|Pkwy)\b~', $html);
-	if (!$isShell && !$hasAddress) {
+	if (!$isShell && !$hasAddress && !in_array($siteType, ['portfolio', 'saas'], true)) {
 		$add('contact', 'warn', 6, "No address written on the page",
 			"If your address only lives inside a map image, Google and AI tools can't read it. That matters for showing up in local searches.");
 	}
@@ -439,6 +570,47 @@ function audit_run(string $inputUrl): array
 		$add('design', 'good', 0, "Modern layout techniques", "Built with current CSS rather than legacy workarounds.");
 	}
 
+	// ---- Checks that only make sense for this kind of site
+	if ($siteType === 'ecommerce') {
+		if (!preg_match('~"@type"\s*:\s*"(Product|Offer)"~i', $html)) {
+			$add('search', 'bad', 8, "Products have no structured data",
+				"Without product schema, Google cannot show your price, availability or rating in results. Competitors who have it take up more of the page.");
+		} else {
+			$add('search', 'good', 0, "Product data is marked up", "Google can show price and availability in search results.");
+		}
+		if (!preg_match('~\b(free shipping|returns|refund|money[- ]back|secure checkout|satisfaction guarantee)\b~i', $visible)) {
+			$add('copy', 'warn', 4, "No shipping or returns reassurance",
+				"Shoppers look for returns, shipping and guarantee wording before entering a card. Not finding it is a common reason carts get abandoned.");
+		}
+	}
+
+	if ($siteType === 'saas') {
+		if (!preg_match('~\b(sign up|get started|start free|book a demo|request a demo|try it free)\b~i', $visible)) {
+			$add('copy', 'bad', 8, "No obvious next step",
+				"There is no clear sign-up or demo call to action. Interested visitors have nothing to click.");
+		}
+		if (!preg_match('~\b(pricing|per month|/mo\b|free plan)\b~i', $visible)) {
+			$add('copy', 'warn', 4, "Pricing is not mentioned",
+				"Buyers who cannot find pricing often assume it is expensive and leave rather than ask.");
+		}
+	}
+
+	if ($siteType === 'portfolio') {
+		if (!preg_match('~\b(work|project|case stud|portfolio|built|shipped)\b~i', $visible)) {
+			$add('copy', 'bad', 8, "No work shown",
+				"A portfolio without visible projects asks someone to take your word for it. Show what you built.");
+		}
+		if (!preg_match('~github\.com|gitlab\.com|linkedin\.com|dribbble\.com|behance\.net~i', $html)) {
+			$add('contact', 'warn', 4, "No links to profiles elsewhere",
+				"Hiring managers look for GitHub or LinkedIn to verify what they are reading.");
+		}
+	}
+
+	if ($siteType === 'local' && !preg_match('~\b(hours|open|closed|mon(day)?|appointment|walk[- ]in)\b~i', $visible)) {
+		$add('contact', 'warn', 5, "No opening hours on the page",
+			"Hours are one of the most looked-for things on a local business site, and a common reason someone calls instead of just showing up.");
+	}
+
 	// ---- Trust and platform, reported but not scored
 	$https = ($res['scheme'] ?? '') === 'https';
 	if (!$https) {
@@ -491,6 +663,9 @@ function audit_run(string $inputUrl): array
 			? "Nothing broken here. This is a well-built site."
 			: ($bad === 1 ? "One thing on this page is costing you customers." : "$bad things on this page are costing you customers."),
 		'platform' => $platform,
+		'site_type' => $siteType,
+		'site_type_label' => audit_type_label($siteType),
+		'detected' => $detected,
 		'page_kb' => $totalKb,
 		'html_kb' => $htmlKb,
 		'seconds' => $res['seconds'],

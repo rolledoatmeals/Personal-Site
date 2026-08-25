@@ -1765,3 +1765,15 @@ body.loaded .hero-links {
 .audit-result .audit-cta { text-align: left }
 .audit-finding strong,
 .audit-finding p { text-align: left }
+.audit-type-row {
+	display: flex; align-items: center; justify-content: center;
+	flex-wrap: wrap; gap: .55rem; margin: .9rem 0 0; font-size: .85rem; color: var(--muted);
+}
+.audit-type-row label { font-family: var(--font-mono); font-size: .74rem; letter-spacing: .08em; text-transform: uppercase }
+.audit-type-row select {
+	font: inherit; font-size: .85rem; color: var(--white);
+	background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.14);
+	border-radius: 100px; padding: .35rem .8rem;
+}
+.audit-type-note { flex-basis: 100%; font-size: .78rem; color: #7d8698 }
+.audit-chip.is-type { border-color: rgba(0,230,118,.35); color: var(--accent) }
