@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Website audit &mdash; {{ report.url }}</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="stylesheet" href="/assets/css/report.css?v={{ asset_version|default('1') }}">
+</head>
+<body>
+  <div class="sheet">
+    <header>
+      <div>
+        <h1>Website Audit</h1>
+        <div class="url">{{ report.url }}</div>
+        <div class="when">{{ "now"|date("F j, Y") }}</div>
+      </div>
+      <div class="scorebox {{ report.score >= 85 ? 'good' : (report.score >= 60 ? 'warn' : 'bad') }}">
+        <b>{{ report.score }}</b>
+        <span>out of 100</span>
+      </div>
+    </header>
+
+    <p class="headline">{{ report.headline }}</p>
+
+    <p class="meta">
+      <span><strong>Platform:</strong> {{ report.platform }}</span>
+      <span><strong>Weight:</strong> {{ report.page_kb }} KB</span>
+      <span><strong>Response:</strong> {{ report.seconds }}s</span>
+      <span><strong>HTTPS:</strong> {{ report.https ? 'yes' : 'no' }}</span>
+      <span><strong>Analytics:</strong> {{ report.analytics ? 'yes' : 'no' }}</span>
+      {% if report.js_rendered %}<span><strong>Note:</strong> renders with JavaScript, so some checks are limited</span>{% endif %}
+    </p>
+
+    {% for cat in report.categories %}
+    <section class="cat">
+      <div class="ch">
+        <h2>{{ cat.label }}</h2>
+        <span class="pct {{ cat.pct >= 85 ? 'good' : (cat.pct >= 60 ? 'warn' : 'bad') }}">{{ cat.pct }}%</span>
+      </div>
+      <div class="bar"><i class="{{ cat.pct >= 85 ? 'good' : (cat.pct >= 60 ? 'warn' : 'bad') }}" data-w="{{ cat.pct }}"></i></div>
+      <ul>
+        {% for f in cat.findings %}
+        <li class="f">
+          <span class="m {{ f.level }}">{% if f.level == 'bad' %}&#10007;{% elseif f.level == 'warn' %}!{% else %}&#10003;{% endif %}</span>
+          <div><strong>{{ f.title }}</strong><p>{{ f.detail }}</p></div>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endfor %}
+
+    <footer>
+      Audited with the free tool at zacharyshep.com/audit &nbsp;&middot;&nbsp; Questions, or want these fixed: {{ contact.email }}
+    </footer>
+
+    <div class="actions no-print">
+      <button type="button" id="print">Save as PDF</button>
+      <a href="/audit?url={{ report.url|url_encode }}">Back to the tool</a>
+    </div>
+  </div>
+
+<style nonce="{{ nonce }}">
+{% for cat in report.categories %}.bar i[data-w="{{ cat.pct }}"]{width:{{ cat.pct }}%}
+{% endfor %}</style>
+<script nonce="{{ nonce }}">
+  document.getElementById('print').addEventListener('click', function () { window.print(); });
+  if (new URLSearchParams(location.search).get('print') === '1') {
+    window.addEventListener('load', function () { setTimeout(function () { window.print(); }, 350); });
+  }
+</script>
+</body>
+</html>

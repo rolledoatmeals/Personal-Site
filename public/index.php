@@ -11,7 +11,7 @@ $twig = new Environment($loader);
 
 $siteTitle = 'Zachary Shepelsky';
 $siteTagline = 'AI Operations & Automation based in Tampa, FL';
-$pageTitle = $siteTitle . ' | ' . $siteTagline;
+$pageTitle = $siteTitle . ' | AI Operations & Automation';
 $siteDescription = 'Zachary Shepelsky builds AI operations and automation systems in Tampa, Florida. Salesforce integrations, CRM builds, and the web work in between.';
 $contactEmail = 'zshepelsky@gmail.com';
 $linkedinUrl = 'https://www.linkedin.com/in/zachary-shepelsky/';
@@ -261,6 +261,25 @@ $data = [
 ];
 
 // Render to a string so headers and optional gzip transport can be applied first.
+if ($requestPath === '/audit/report') {
+	require_once __DIR__ . '/../lib/audit.php';
+	$target = (string) ($_GET['url'] ?? '');
+	$report = $target !== '' && strlen($target) <= 300 ? audit_run($target) : ['error' => 'No website address given.'];
+	if (isset($report['error'])) {
+		http_response_code(400);
+		audit_security_headers($nonce);
+		echo '<!doctype html><meta charset="utf-8"><title>Audit</title><p style="font:14px system-ui;padding:2rem">'
+			. htmlspecialchars($report['error'], ENT_QUOTES) . '</p>';
+		exit;
+	}
+	$data['report'] = $report;
+	$data['nonce'] = $nonce;
+	$data['seo']['robots'] = 'noindex';
+	audit_security_headers($nonce);
+	echo $twig->render('audit-report.html.twig', $data);
+	exit;
+}
+
 if (($requestPath ?? parse_url($requestUri, PHP_URL_PATH)) === '/audit') {
 	$data['seo']['title'] = 'Free Website Audit | ' . $siteTitle;
 	$data['seo']['description'] = 'Paste a website address and get a plain-English report on speed, mobile usability, and search visibility in about ten seconds.';

@@ -38,7 +38,7 @@
           <div class="audit-cta">
             <p>Keep this report, or send it to whoever owns the site.</p>
             <div class="audit-cta-actions">
-              <button type="button" class="btn btn-primary" id="audit-download">Save as PDF</button>
+              <a class="btn btn-primary" id="audit-download" target="_blank" rel="noopener" href="#">Save as PDF</a>
               <button type="button" class="btn btn-ghost" id="audit-copy">Copy as text</button>
               <button type="button" class="btn btn-ghost" id="audit-share">Copy link</button>
             </div>
@@ -181,6 +181,8 @@
 		setRules(rules.join(''));
 
 		lastReport = data;
+		document.getElementById('audit-download').href =
+			'/audit/report?print=1&url=' + encodeURIComponent(data.url);
 
 		result.hidden = false;
 		requestAnimationFrame(function () {
@@ -300,20 +302,6 @@
 			'<footer>Audited with the free tool at zacharyshep.com/audit &nbsp;&middot;&nbsp; Questions, or want these fixed: {{ contact.email }}</footer>' +
 			'</body></html>';
 	}
-
-	document.getElementById('audit-download').addEventListener('click', function () {
-		if (!lastReport) return;
-		var w = window.open('', '_blank');
-		if (!w) {
-			status.textContent = 'Allow pop-ups for this site to open the report.';
-			return;
-		}
-		w.document.open();
-		w.document.write(reportHtml(lastReport));
-		w.document.close();
-		w.focus();
-		setTimeout(function () { w.print(); }, 400);
-	});
 
 	document.getElementById('audit-copy').addEventListener('click', function () {
 		if (!lastReport) return;
