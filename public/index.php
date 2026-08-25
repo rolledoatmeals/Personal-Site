@@ -179,6 +179,14 @@ $data = [
 	],
 	'work' => [
 		[
+			'title' => 'Website Audit MCP server',
+			'stat' => 'Install it in one command',
+			'context' => 'Open source on GitHub',
+			'blurb' => 'The same audit engine, handed to AI assistants through the Model Context Protocol. Anyone running Claude Code or Cursor installs it and just says "audit example.com". One capability, shipped two ways: a web page for people, a protocol server for agents.',
+			'tags' => ['MCP', 'Node', 'Open source'],
+			'url' => 'https://github.com/rolledoatmeals/website-audit-mcp',
+		],
+		[
 			'title' => 'Website audit tool',
 			'stat' => 'Try it live, right now',
 			'context' => 'Running on this site',
