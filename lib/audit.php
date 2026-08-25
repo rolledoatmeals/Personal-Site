@@ -276,6 +276,7 @@ function audit_run(string $inputUrl, string $typeOverride = ''): array
 	$base = $res['url'];
 	$htmlKb = (int) round($res['bytes'] / 1024);
 	$origin = (parse_url($base, PHP_URL_SCHEME) ?: 'https') . '://' . parse_url($base, PHP_URL_HOST);
+	$https = ($res['scheme'] ?? '') === 'https';
 
 	// Categories carry their own weight so one bad area can't sink the score alone.
 	$cats = [
@@ -587,6 +588,81 @@ function audit_run(string $inputUrl, string $typeOverride = ''): array
 		$add('design', 'good', 0, "Modern layout techniques", "Built with current CSS rather than legacy workarounds.");
 	}
 
+	// ---- Things a browser notices that a page-level scan usually misses
+
+	// Mixed content: an HTTPS page pulling assets over HTTP. Browsers block
+	// or downgrade these, and it is a common cause of "not secure" warnings
+	// on sites whose owners think they have SSL sorted.
+	if ($https) {
+		preg_match_all('~(?:src|href)=["\'](http://[^"\']+)["\']~i', $html, $mixed);
+		$mixedAssets = array_values(array_filter($mixed[1] ?? [], function ($u) {
+			return !preg_match('~\.(xml|txt)$~i', $u) && !str_contains($u, 'schema.org') && !str_contains($u, 'www.w3.org');
+		}));
+		if ($mixedAssets) {
+			$n = count(array_unique($mixedAssets));
+			$add('contact', 'bad', 10, "$n insecure resource" . ($n === 1 ? '' : 's') . " on a secure page",
+				"The page loads over HTTPS but pulls files over plain HTTP. Browsers block those or drop the padlock, so visitors can see a security warning on a site you believe is secure.");
+		}
+	}
+
+	// Does the plain HTTP address reach HTTPS? A site serving both splits its
+	// search authority and leaves visitors on the insecure copy.
+	if ($https) {
+		$host = parse_url($base, PHP_URL_HOST);
+		$plain = audit_fetch('http://' . $host . '/', 1, 8, true);
+		if ($plain && $plain['status'] === 200 && ($plain['scheme'] ?? '') === 'http') {
+			$add('search', 'warn', 5, "The insecure address still works",
+				"http://$host loads without redirecting to the secure version. Google treats the two as separate sites, which splits your ranking between them.");
+		}
+	}
+
+	// Favicon: cheap to add, and its absence is the first thing a visitor sees
+	// in a crowded tab bar.
+	$hasIcon = (bool) preg_match('~<link[^>]+rel=["\'][^"\']*icon~i', $html);
+	if (!$hasIcon) {
+		$ico = audit_fetch($origin . '/favicon.ico', 1, 5, true);
+		$hasIcon = $ico && $ico['status'] === 200;
+	}
+	if (!$hasIcon) {
+		$add('design', 'warn', 4, "No icon in the browser tab",
+			"With no favicon the tab shows a blank page symbol. It is a small thing that reads as unfinished, and it takes minutes to fix.");
+	}
+
+	// Sample internal links. A dead link on a homepage is embarrassing and
+	// common on sites that have been edited over years.
+	preg_match_all('~<a[^>]+href=["\']([^"\'#]+)["\']~i', $html, $links);
+	$internal = [];
+	foreach (array_unique($links[1] ?? []) as $href) {
+		if (preg_match('~^(mailto:|tel:|javascript:|data:)~i', $href)) continue;
+		$abs = audit_resolve_url($base, $href);
+		if (!$abs || parse_url($abs, PHP_URL_HOST) !== parse_url($base, PHP_URL_HOST)) continue;
+		if ($abs === $base) continue;
+		$internal[] = $abs;
+	}
+	$internal = array_slice(array_values(array_unique($internal)), 0, 6);
+	$broken = [];
+	foreach ($internal as $link) {
+		$r = audit_fetch($link, 1, 6, true);
+		if ($r && $r['status'] >= 400) $broken[] = $link;
+	}
+	if ($broken) {
+		$n = count($broken);
+		$first = parse_url($broken[0], PHP_URL_PATH) ?: $broken[0];
+		$add('search', 'bad', 8, "$n link" . ($n === 1 ? '' : 's') . " on this page " . ($n === 1 ? 'is' : 'are') . " broken",
+			"Following " . ($n === 1 ? 'it' : 'them') . " lands on an error page. First one: $first. Visitors who hit a dead link usually leave rather than hunt for the right page.");
+	} elseif ($internal) {
+		$add('search', 'good', 0, "Links all work", count($internal) . " checked, none broken.");
+	}
+
+	// Stylesheets in the head block the first paint.
+	$head = substr($html, 0, (int) (stripos($html, '</head>') ?: 4000));
+	$blockingCss = preg_match_all('~<link[^>]+rel=["\']stylesheet["\'][^>]*>~i', $head, $bc);
+	$blockingCss -= preg_match_all('~<link[^>]+rel=["\']stylesheet["\'][^>]*(media=["\']print|onload=)~i', $head);
+	if ($blockingCss > 4) {
+		$add('speed', 'warn', 5, "$blockingCss stylesheets load before anything appears",
+			"Each one has to download before the browser paints a single pixel. Combining them is one of the cheapest speed wins available.");
+	}
+
 	// ---- Checks that only make sense for this kind of site
 	if ($siteType === 'ecommerce') {
 		if (!preg_match('~"@type"\s*:\s*"(Product|Offer)"~i', $html)) {
@@ -629,7 +705,6 @@ function audit_run(string $inputUrl, string $typeOverride = ''): array
 	}
 
 	// ---- Trust and platform, reported but not scored
-	$https = ($res['scheme'] ?? '') === 'https';
 	if (!$https) {
 		$add('contact', 'bad', 12, "The site isn't secure",
 			"No HTTPS. Browsers mark the site 'Not secure' in the address bar, and visitors notice.");
@@ -650,6 +725,13 @@ function audit_run(string $inputUrl, string $typeOverride = ''): array
 	}
 
 	$hasAnalytics = (bool) preg_match('~googletagmanager|google-analytics|gtag\(|fbq\(|plausible|fathom|posthog~i', $html);
+
+	if (!$hasAnalytics && $siteType !== 'portfolio') {
+		$add('search', 'warn', 5, "Nothing is measuring this site",
+			"No analytics of any kind is installed, so there is no way to tell how many people visit, what they look at, or whether anything you change actually helps. You are flying blind.");
+	} elseif ($hasAnalytics) {
+		$add('search', 'good', 0, "Traffic is being measured", "Analytics is installed, so the site's performance is visible.");
+	}
 
 	// ---- Score
 	$categories = [];
