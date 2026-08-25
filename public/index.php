@@ -10,9 +10,9 @@ $loader = new FilesystemLoader(__DIR__ . '/../templates');
 $twig = new Environment($loader);
 
 $siteTitle = 'Zachary Shepelsky';
-$siteTagline = 'AI Automation & Web Developer based in Tampa, FL';
+$siteTagline = 'AI Operations & Automation based in Tampa, FL';
 $pageTitle = $siteTitle . ' | ' . $siteTagline;
-$siteDescription = 'Portfolio site for Zachary Shepelsky, an AI automation and web developer based in Tampa, Florida, featuring background, skills, and contact information.';
+$siteDescription = 'Zachary Shepelsky builds AI operations and automation systems in Tampa, Florida. Salesforce integrations, CRM builds, and the web work in between.';
 $contactEmail = 'zshepelsky@gmail.com';
 $linkedinUrl = 'https://www.linkedin.com/in/zachary-shepelsky/';
 
@@ -48,7 +48,7 @@ $data = [
 	'seo' => [
 		'title' => $pageTitle,
 		'description' => $siteDescription,
-		'keywords' => 'Zachary Shepelsky, AI automation, web developer, Tampa Florida, PHP developer, social media management',
+		'keywords' => 'Zachary Shepelsky, AI operations, automation engineer, Salesforce, systems integration, Tampa Florida, web developer',
 		'robots' => 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1',
 		'canonical_url' => $canonicalUrl,
 		'og_type' => 'website',
@@ -61,7 +61,7 @@ $data = [
 					'@id' => $canonicalUrl . '#person',
 					'name' => $siteTitle,
 					'url' => $canonicalUrl,
-					'jobTitle' => 'AI Automation & Web Developer',
+					'jobTitle' => 'AI Operations & Automation',
 					'description' => $siteDescription,
 					'email' => 'mailto:' . $contactEmail,
 					'image' => [
@@ -109,34 +109,79 @@ $data = [
 		], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
 	],
 	'hero' => [
-		'descriptor' => 'I build websites, automation systems, and AI integrations for real clients — focused on what actually delivers results.',
+		'descriptor' => 'I wire business systems together so the work runs on its own. Salesforce, CRMs, websites, and the automation in between.',
 	],
 	'person' => [
 		'name' => $siteTitle,
 		'location' => 'Tampa, Florida',
-		'bio' => "I work in web development and AI automation out of Tampa, Florida. I started by building real things for real clients — websites, automation flows, CRM integrations — and learned what I needed along the way.\n\nMost of my time is spent in PHP, HTML, CSS, JavaScript, and AI tooling. I've done freelance automation work with GoHighLevel, set up webhook-driven CRM systems, built AI chatbots, and managed social media growth from zero. Every project gets the same approach: figure out what actually needs to happen, then build it properly.",
-		'bio2' => "Outside of work I'm at the gym, snowboarding when the season hits, at the beach, or trying somewhere new to eat in Tampa. I also spend time building personal projects, applications, and useful tools with code. I try to stay active and keep sharp.",
+		'bio' => "I do AI operations for an industrial staffing company. Most of that is connecting Salesforce to everything else so the numbers people depend on show up on their own instead of being rebuilt by hand every week.\n\nBefore that I built websites and CRM systems for clients, and I still do through my own studio. The work I like best is when something is quietly broken and nobody has noticed. A form that stopped sending. A report that has been wrong for months. Those are usually configuration problems rather than code problems, and finding them takes patience more than cleverness.",
+		'bio2' => "Outside work I'm at the gym, snowboarding when there's a season worth catching, or finding somewhere new to eat around Tampa. I'm also taking night classes for an AI degree while working full time.",
 		'hobbies' => ['Gym', 'Snowboarding', 'Beach', 'Food'],
 	],
+	'work' => [
+		[
+			'title' => 'Salesforce to Align integration',
+			'context' => 'Industrial staffing company',
+			'blurb' => 'Wired the company system of record into their meeting software so daily operating numbers feed themselves every morning instead of being rebuilt by hand each week. Traced a metric-definition defect that was inflating reported figures and reconciled the feed exactly to the official weekly report.',
+			'tags' => ['Salesforce', 'Apex', 'Scheduled feeds', 'Data integrity'],
+			'url' => '',
+		],
+		[
+			'title' => 'Vendor-to-Salesforce bridge',
+			'context' => 'Recruiting pipeline automation',
+			'blurb' => 'The vendor had no export and no API worth the name. Built a scheduled cloud bot that signs in, pulls new applicants and writes them straight into Salesforce, working alongside the vendor engineering team. Also fixed the duplicate-record flow so one person applying to three jobs stays one person.',
+			'tags' => ['GitHub Actions', 'Integration', 'Automation'],
+			'url' => '',
+		],
+		[
+			'title' => 'AI marketing system',
+			'context' => 'B2B certification company',
+			'blurb' => 'A brand knowledge base plus five purpose-built agents covering email, sales copy, prospect research and campaign collateral. Produces publish-ready work rather than drafts, so the marketing output of a team comes out of one person.',
+			'tags' => ['Claude API', 'Knowledge base', 'Agents'],
+			'url' => '',
+		],
+		[
+			'title' => 'DevSply',
+			'context' => 'My web and automation studio',
+			'blurb' => 'Client sites designed, built and deployed on Astro, React and WordPress. Five live properties across diesel repair, mens health and e-commerce, plus GoHighLevel CRM systems wired end to end with lead routing, follow-up and conversion tracking.',
+			'tags' => ['Astro', 'React', 'WordPress', 'GoHighLevel'],
+			'url' => 'https://devsply.com',
+		],
+		[
+			'title' => 'Salon site rebuild',
+			'context' => 'Wig Design by Flora',
+			'blurb' => 'Built the original site, then got brought back two years later to rebuild it end to end. Restructured the architecture and shortened the path to booking an appointment. Sales grew 300 percent year to date after launch.',
+			'tags' => ['Booking flow', 'Performance', 'Conversion'],
+			'url' => '',
+		],
+		[
+			'title' => 'Lender systems audit',
+			'context' => 'Commercial real estate lender',
+			'blurb' => 'Went through the website and CRM before quoting anything. Found borrower financial documents sitting publicly readable, form submissions silently failing to reach the CRM, and an ad account that had never once recorded a conversion. Scoped the rebuild in phases from there.',
+			'tags' => ['Technical audit', 'Security review', 'CRM'],
+			'url' => '',
+		],
+	],
 	'skills' => [
-		['name' => 'PHP',            'desc' => 'Backend logic & server-side scripting'],
-		['name' => 'HTML',           'desc' => 'Semantic, accessible markup'],
-		['name' => 'CSS',            'desc' => 'Responsive layouts & polished UI'],
-		['name' => 'JavaScript',     'desc' => 'Dynamic interactions & browser logic'],
-		['name' => 'AI Automation',  'desc' => 'Chatbots, workflows & AI integrations'],
-		['name' => 'GoHighLevel',    'desc' => 'CRM pipelines & marketing automation'],
-		['name' => 'CRM',            'desc' => 'Webhook configs & system integrations'],
-		['name' => 'Vibe Coding',    'desc' => 'Building fast with AI-assisted tools'],
+		['name' => 'Salesforce',   'desc' => 'Flows, Apex, CLI deploys, reports and dashboards'],
+		['name' => 'Integrations', 'desc' => 'REST APIs, webhooks and scheduled jobs'],
+		['name' => 'AI Systems',   'desc' => 'Claude API, MCP servers, agents and knowledge bases'],
+		['name' => 'Automation',   'desc' => 'Replacing manual work with jobs that run themselves'],
+		['name' => 'Web',          'desc' => 'React, Astro, PHP and WordPress'],
+		['name' => 'GoHighLevel',  'desc' => 'CRM pipelines, lead routing and follow-up'],
+		['name' => 'Diagnosis',    'desc' => 'Root-cause tracing and data-quality audits'],
+		['name' => 'AI-Assisted Delivery', 'desc' => 'Shipping production systems with AI tooling'],
 	],
 	'nav' => [
 		['label' => 'About', 'scroll' => 'about'],
+		['label' => 'Work', 'scroll' => 'work'],
 		['label' => 'Skills', 'scroll' => 'skills'],
 		['label' => 'Contact', 'scroll' => 'contact'],
 	],
 	'contact' => [
 		'email'   => $contactEmail,
 		'linkedin' => $linkedinUrl,
-		'blurb'   => 'Building something and need a developer? Looking to automate your workflow? Want to talk AI? Reach out — I\'d like to hear about it.',
+		'blurb'   => 'If you are hiring for operations, automation, or Salesforce work, I would like to talk. Email is fastest.',
 	],
 	'nonce' => $nonce,
 ];

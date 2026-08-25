@@ -50,6 +50,31 @@
       </div>
     </section>
 
+    <section id="work" class="work section--work">
+      <div class="container">
+        <h2>Work</h2>
+        <p class="work-intro">Systems I have built and shipped. Client names are left out where the work is not mine to publish.</p>
+        <div class="work-grid">
+{% for w in work %}
+          <article class="work-card">
+            <div class="work-head">
+              <h3 class="work-title">{{ w.title }}</h3>
+              {% if w.url %}<a class="work-link" href="{{ w.url }}" target="_blank" rel="noopener" aria-label="Visit {{ w.title }}">Visit &#8599;</a>{% endif %}
+            </div>
+            <p class="work-context">{{ w.context }}</p>
+            <p class="work-blurb">{{ w.blurb }}</p>
+            <ul class="work-tags">
+{% for t in w.tags %}
+              <li>{{ t }}</li>
+{% endfor %}
+            </ul>
+          </article>
+{% endfor %}
+        </div>
+      </div>
+    </section>
+
+    
     <section id="skills" class="skills section--skills">
       <div class="container">
         <h2>Skills</h2>
