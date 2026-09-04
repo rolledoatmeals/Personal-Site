@@ -498,11 +498,34 @@ function audit_run(string $inputUrl, string $typeOverride = ''): array
 
 	$hasEmail = preg_match('~href=["\']mailto:~i', $html);
 	$hasForm = preg_match('~<form~i', $html);
-	if (!$isShell && !$hasEmail && !$hasForm) {
-		$add('contact', 'bad', 10, "No form and no email address",
-			"Someone who'd rather not call has no way to reach you from this page.");
-	} elseif ($hasForm) {
+
+	// A page with no form often links to one. Follow an on-site contact link
+	// before claiming nobody can get in touch (Astro/Next sites in particular
+	// keep the form on /contact/ rather than the home page).
+	$contactFormFound = false;
+	if (!$isShell && !$hasForm && !$hasEmail
+		&& preg_match('~href=["\']([^"\']*(?:contact|get-?in-?touch|enquir|inquir|request-?a?-?quote)[^"\']*)["\']~i', $html, $cm)) {
+		$cu = html_entity_decode($cm[1]);
+		if (str_starts_with($cu, '//')) { $cu = 'https:' . $cu; }
+		elseif (str_starts_with($cu, '/')) { $cu = $origin . $cu; }
+		elseif (!preg_match('~^https?://~i', $cu)) { $cu = $origin . '/' . ltrim($cu, './'); }
+		if (stripos($cu, $origin) === 0 && !str_contains($cu, '#')) {
+			$cp = audit_fetch($cu, 600_000, 8);
+			if ($cp && $cp['status'] === 200
+				&& (preg_match('~<form~i', $cp['body']) || preg_match('~href=["\']mailto:~i', $cp['body']))) {
+				$contactFormFound = true;
+			}
+		}
+	}
+
+	if ($hasForm) {
 		$add('contact', 'good', 0, "There's a contact form", "Visitors who won't call still have a way through.");
+	} elseif ($contactFormFound) {
+		$add('contact', 'good', 0, "Contact form on the contact page",
+			"Not on this page itself, but the linked contact page has a working way in.");
+	} elseif (!$isShell && !$hasEmail) {
+		$add('contact', 'bad', 10, "No form and no email address",
+			"Someone who'd rather not call has no way to reach you from this page, and no linked contact page with one was found.");
 	}
 
 	$hasAddress = preg_match('~\b[A-Z]{2}\s*\d{5}\b~', $html) || preg_match('~\d{2,6}\s+[A-Z][A-Za-z.\' ]{2,30}\s+(St|Street|Ave|Avenue|Blvd|Rd|Road|Dr|Drive|Way|Ln|Hwy|Pkwy)\b~', $html);
