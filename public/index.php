@@ -185,6 +185,8 @@ $data = [
 			'blurb' => 'Checks a site the way a phone would: page weight, oversized images, whether search engines can read it, whether the copy sounds machine-written. Runs as a web page, a head-to-head comparison, or an MCP server.',
 			'tags' => ['PHP', 'Node', 'MCP', 'Live tool'],
 			'url' => '/audit',
+			'repo' => 'https://github.com/rolledoatmeals/website-audit-mcp',
+			'install' => 'claude mcp add website-audit -- npx -y github:rolledoatmeals/website-audit-mcp',
 		],
 		[
 			'title' => 'Salesforce to Align integration',
@@ -238,8 +240,9 @@ $data = [
 		['name' => 'AI-Assisted Delivery', 'desc' => 'Shipping production systems with AI tooling'],
 	],
 	'nav' => [
-		['label' => 'About', 'scroll' => 'about'],
+		// Order follows the page: hero, work, about, skills, contact.
 		['label' => 'Work', 'scroll' => 'work'],
+		['label' => 'About', 'scroll' => 'about'],
 		['label' => 'Skills', 'scroll' => 'skills'],
 		['label' => 'Audit tool', 'href' => '/audit'],
 		['label' => 'Compare', 'href' => '/compare'],
