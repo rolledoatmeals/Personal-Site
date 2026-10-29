@@ -8,10 +8,12 @@
   <main>
     <section id="audit" class="audit section--dark">
       <div class="container audit-inner">
-        <p class="hero-eyebrow">Live tool &middot; built by {{ person.name }}</p>
+        <div class="audit-split">
+        <div class="audit-pitch">
         <h1 class="audit-title">Is your website costing you customers?</h1>
-        <p class="audit-sub">Paste an address. In about ten seconds you get the same checks I run by hand before quoting any client: speed, mobile usability, and whether search engines can actually read the page.</p>
+        <p class="audit-sub">Paste an address. In about ten seconds you get the same checks I run by hand before quoting any client &mdash; my own engine, not a plugin.</p>
 
+        <div class="audit-card">
         <form id="audit-form" class="audit-form" autocomplete="off">
           <input id="audit-url" type="text" inputmode="url" placeholder="yourbusiness.com" aria-label="Website address" required>
           <button type="submit" class="btn btn-primary" id="audit-go">Run the audit</button>
@@ -27,6 +29,49 @@
           </select>
           <span class="audit-type-note">Changes what counts. A missing phone number matters for a shop, not for a portfolio.</span>
         </p>
+        </div>
+
+        <ul class="audit-checks" aria-label="What this checks">
+          <li>Speed</li>
+          <li>Phone experience</li>
+          <li>Getting found</li>
+          <li>Getting in touch</li>
+          <li>How the writing reads</li>
+          <li>How current it looks</li>
+        </ul>
+        </div>
+
+        <figure class="audit-specimen" id="audit-specimen">
+          <figcaption class="spec-label">Sample report</figcaption>
+          <div class="spec-head">
+            <div class="spec-score-wrap">
+              <svg class="spec-ring" viewBox="0 0 120 120" aria-hidden="true">
+                <circle cx="60" cy="60" r="52" class="spec-ring-bg"/>
+                <circle cx="60" cy="60" r="52" class="spec-ring-fg" id="spec-ring"/>
+              </svg>
+              <div class="spec-score" id="spec-score">0</div>
+            </div>
+            <div class="spec-meta">
+              <p class="spec-headline">4 things on this page are costing you customers.</p>
+              <p class="spec-url">yourbusiness.com</p>
+            </div>
+          </div>
+          <ul class="audit-findings spec-findings" id="spec-findings">
+            <li class="audit-finding is-bad">
+              <strong>The HTML alone is 920 KB</strong>
+              <p>Before a single image or script, the page document itself is this big.</p>
+            </li>
+            <li class="audit-finding is-bad">
+              <strong>Nobody can tap to call you</strong>
+              <p>There&rsquo;s no tap-to-call link on this page. On a phone, every extra step between someone and your number costs you calls.</p>
+            </li>
+            <li class="audit-finding is-warn">
+              <strong>The writing leans generic</strong>
+              <p>A few stock marketing phrases showed up: holistic approach, transformative.</p>
+            </li>
+          </ul>
+        </figure>
+        </div>
 
         <div id="audit-status" class="audit-status" role="status" aria-live="polite"></div>
 
@@ -117,6 +162,10 @@
 	}
 
 	function render(data) {
+		// A real report supersedes the sample.
+		var specimen = document.getElementById('audit-specimen');
+		if (specimen) specimen.hidden = true;
+
 		var score = data.score;
 		var scoreEl = document.getElementById('audit-score');
 		var ring = document.getElementById('audit-ring-fg');
@@ -314,6 +363,40 @@
 		}
 	});
 
+})();
+</script>
+
+<script nonce="{{ nonce }}">
+(function () {
+	var ring = document.getElementById('spec-ring');
+	var scoreEl = document.getElementById('spec-score');
+	var list = document.getElementById('spec-findings');
+	if (!ring || !scoreEl || !list) return;
+
+	var C = 2 * Math.PI * 52;
+	var target = 50;
+	var rest = C * (1 - target / 100);
+	ring.style.strokeDasharray = C;
+
+	if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+		ring.style.strokeDashoffset = rest;
+		scoreEl.textContent = target;
+		list.classList.add('in');
+		return;
+	}
+
+	ring.style.strokeDashoffset = C;
+	setTimeout(function () {
+		ring.style.strokeDashoffset = rest;
+		list.classList.add('in');
+		var start = null;
+		requestAnimationFrame(function step(now) {
+			if (start === null) start = now;
+			var t = Math.min(1, (now - start) / 1200);
+			scoreEl.textContent = Math.round(target * (1 - Math.pow(1 - t, 3)));
+			if (t < 1) requestAnimationFrame(step);
+		});
+	}, 420);
 })();
 </script>
 {% endblock %}

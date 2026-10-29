@@ -40,7 +40,11 @@
 	// the heading. Aim at the heading instead and tuck it under the nav.
 	function sectionScrollTop(target) {
 		const nav = document.querySelector('.site-nav');
-		const navH = nav ? nav.getBoundingClientRect().height : 0;
+		// Measure the bar, not the header. With the mobile menu open the fixed
+		// header grows to ~375px tall, and subtracting that instead of the 63px
+		// bar left every jump from the mobile menu ~310px short of its section.
+		const bar = nav ? (nav.querySelector('.nav-inner') || nav) : null;
+		const navH = bar ? bar.getBoundingClientRect().height : 0;
 		const anchor = target.querySelector('h2, .about-heading, h1') || target;
 		const y = window.scrollY + anchor.getBoundingClientRect().top - navH - 28;
 		return Math.max(0, Math.round(y));

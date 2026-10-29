@@ -899,7 +899,16 @@ section {
 	padding: .85rem 1.1rem;
 	border-radius: 999px;
 	text-decoration: none;
+	/* <button class="btn"> otherwise keeps the browser's own border and 13px
+	   type, so form buttons drew a stray ring and sat smaller than the
+	   <a class="btn"> ones. .btn-ghost adds its border back below. */
+	border: 0;
+	appearance: none;
+	-webkit-appearance: none;
+	font-family: inherit;
+	font-size: inherit;
 	font-weight: 700;
+	cursor: pointer;
 	transition: transform .2s ease, box-shadow .2s ease
 }
 
@@ -1635,6 +1644,30 @@ body.loaded .hero-links {
 	transition: border-color .18s ease
 }
 .work-link:hover { border-bottom-color: var(--accent) }
+.work-links {
+	display: flex;
+	gap: .75rem;
+	flex: 0 0 auto
+}
+/* Install line: one command, never wrapped mid-flag. Scrolls on its own on
+   narrow screens rather than stretching the card. */
+.work-install {
+	font-family: var(--font-mono);
+	font-size: .76rem;
+	line-height: 1.6;
+	color: #b9c2d6;
+	background: rgba(0, 0, 0, .28);
+	border: 1px solid rgba(255, 255, 255, .08);
+	border-radius: 10px;
+	padding: .5rem .7rem;
+	margin: 0 0 .35rem;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere
+}
+.work-install code {
+	font: inherit;
+	color: inherit
+}
 .work-context {
 	font-family: var(--font-mono);
 	font-size: .8rem;
@@ -1691,7 +1724,9 @@ body.loaded .hero-links {
 
 /* ---------- Audit tool ---------- */
 .audit { min-height: 100vh; align-items: flex-start; padding-top: 8rem }
-.audit-inner { max-width: 720px; text-align: center }
+/* Wide enough for the form and a report to sit side by side; the single
+   column below 900px falls back to the old reading width. */
+.audit-inner { max-width: 1060px; text-align: center }
 .audit-title {
 	font-family: var(--font-heading);
 	font-size: clamp(1.9rem, 5vw, 3rem);
@@ -1699,6 +1734,111 @@ body.loaded .hero-links {
 	margin: 0 0 1rem;
 }
 .audit-sub { color: var(--muted); max-width: 56ch; margin: 0 auto 2rem; line-height: 1.7 }
+/* The report is this page's product, so the screen leads with one instead of
+   describing it. Same ring, findings and type as a real run — labelled as a
+   sample, and replaced by the real thing the moment someone runs an audit. */
+.audit-split {
+	display: grid;
+	grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
+	gap: 3rem;
+	align-items: center;
+	text-align: left;
+}
+.audit-pitch .audit-title,
+.audit-pitch .audit-sub { margin-left: 0; margin-right: 0 }
+.audit-pitch .audit-card,
+.audit-pitch .audit-checks { margin-left: 0 }
+.audit-pitch .audit-checks { justify-content: flex-start }
+.audit-pitch .audit-type-row { justify-content: flex-start }
+/* The pitch column is half a page wide, so the field and its button stack
+   instead of fighting over one line. */
+.audit-pitch .audit-form { flex-direction: column }
+.audit-pitch .audit-sub { max-width: 46ch }
+
+.audit-specimen {
+	margin: 0;
+	padding: 1.4rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	border: 1px solid rgba(255, 255, 255, .09);
+	border-radius: 20px;
+	background: linear-gradient(160deg, rgba(255, 255, 255, .055), rgba(255, 255, 255, .02));
+	box-shadow: 0 24px 60px rgba(0, 0, 0, .45);
+}
+.spec-label {
+	font-family: var(--font-mono);
+	font-size: .7rem;
+	letter-spacing: .18em;
+	text-transform: uppercase;
+	color: var(--muted);
+}
+.spec-head { display: flex; align-items: center; gap: 1.1rem; text-align: left }
+.spec-score-wrap { position: relative; width: 96px; height: 96px; flex: 0 0 auto }
+.spec-ring { width: 96px; height: 96px; transform: rotate(-90deg) }
+.spec-ring-bg { fill: none; stroke: rgba(255, 255, 255, .08); stroke-width: 10 }
+.spec-ring-fg {
+	fill: none; stroke: #ffd166; stroke-width: 10; stroke-linecap: round;
+	transition: stroke-dashoffset 1.2s cubic-bezier(.22, 1, .36, 1);
+}
+.spec-score {
+	position: absolute; inset: 0; display: grid; place-items: center;
+	font-family: var(--font-heading); font-size: 1.8rem; font-weight: 700;
+	color: var(--white); font-variant-numeric: tabular-nums;
+}
+.spec-headline {
+	font-family: var(--font-heading); font-size: 1.05rem; color: var(--white);
+	margin: 0 0 .3rem; line-height: 1.35;
+}
+.spec-url { font-family: var(--font-mono); font-size: .8rem; color: var(--muted); margin: 0 }
+.spec-findings { gap: .6rem }
+.spec-findings .audit-finding { padding: .75rem .9rem }
+.spec-findings .audit-finding strong { font-size: .9rem }
+.spec-findings .audit-finding p { font-size: .82rem }
+
+@media (max-width: 900px) {
+	.audit-split { grid-template-columns: 1fr; gap: 2rem; text-align: center }
+	.audit-pitch .audit-checks { justify-content: center }
+	.audit-pitch .audit-type-row { justify-content: center }
+	.audit-specimen { width: 100%; max-width: 34rem; margin: 0 auto }
+}
+
+/* One card holds the three controls, so they read as a single thing to fill in
+   instead of three loose elements floating on a tall empty screen. */
+.audit-card {
+	max-width: 34rem;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	gap: .85rem;
+	padding: 1.1rem;
+	background: rgba(255, 255, 255, .035);
+	border: 1px solid rgba(255, 255, 255, .08);
+	border-radius: 20px;
+}
+.audit-card .audit-form { margin: 0 }
+.audit-card .audit-type-row { margin: 0 }
+/* The six checks the engine actually scores — sets expectations before the
+   run, and gives the screen something to say while it is still empty. */
+.audit-checks {
+	list-style: none;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: .45rem;
+	max-width: 34rem;
+	margin: 1.1rem auto 0;
+	padding: 0;
+}
+.audit-checks li {
+	font-family: var(--font-mono);
+	font-size: .74rem;
+	color: #9aa4b8;
+	background: rgba(255, 255, 255, .04);
+	border: 1px solid rgba(255, 255, 255, .07);
+	padding: .28rem .6rem;
+	border-radius: 100px;
+}
 .audit-form { display: flex; gap: .7rem; max-width: 34rem; margin: 0 auto }
 .audit-form input {
 	flex: 1;
@@ -1847,6 +1987,24 @@ body.loaded .hero-links {
 	.cmp-row { grid-template-columns: 1fr; gap: .35rem }
 	.cmp-label { text-align: left; min-width: 0 }
 	.cmp-side:first-child { flex-direction: row }
+}
+
+/* ---------- Phone-size form fields ----------
+   Two things went wrong on a phone:
+   1. These forms turn into column flex containers, which flips the main axis
+      to vertical — so `flex: 1 1 12rem` grew the compare inputs downward into
+      190px-tall blobs. Fields size to their own content instead.
+   2. Anything under 16px makes iOS zoom the page in when the field is focused,
+      and it never zooms back out. 16px keeps the page where it is. */
+@media (max-width: 640px) {
+	.audit-form input,
+	.cmp-form input {
+		flex: 0 0 auto;
+		font-size: 16px
+	}
+	.audit-type-row select { font-size: 16px }
+	.audit-form .btn,
+	.cmp-form .btn { font-size: 16px }
 }
 
 
