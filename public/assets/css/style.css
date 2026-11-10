@@ -1855,6 +1855,11 @@ body.loaded .hero-links {
 .audit-form input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent }
 .audit-status { min-height: 1.5rem; margin-top: 1.1rem; color: var(--cyan); font-family: var(--font-mono); font-size: .85rem }
 .audit-result { margin-top: 2.2rem; text-align: left }
+/* Clear the fixed header when the report is scrolled into view. */
+.audit-result { scroll-margin-top: 5.5rem }
+/* .audit-specimen sets display:flex, which beats the [hidden] attribute,
+   so the sample stayed on screen after a real report loaded. */
+.audit-specimen[hidden] { display: none }
 .audit-head { display: flex; align-items: center; gap: 1.6rem; margin-bottom: 1.6rem }
 .audit-score-wrap { position: relative; width: 110px; height: 110px; flex: 0 0 auto }
 .audit-ring { width: 110px; height: 110px; transform: rotate(-90deg) }

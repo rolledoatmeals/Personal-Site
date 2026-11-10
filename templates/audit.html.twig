@@ -267,6 +267,10 @@
 			'/audit/report?print=1&url=' + encodeURIComponent(data.url);
 
 		result.hidden = false;
+		// The report renders below the form, so bring it into view or the
+		// visitor sees nothing change after clicking Run.
+		var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		result.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
 		requestAnimationFrame(function () {
 			requestAnimationFrame(function () {
 				setRules(rules.join('') + '.audit-ring-fg{stroke-dasharray:' + C + ';stroke-dashoffset:' + (C * (1 - score / 100)) + '}');

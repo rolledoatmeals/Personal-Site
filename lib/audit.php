@@ -761,9 +761,12 @@ function audit_run(string $inputUrl, string $typeOverride = ''): array
 	// ---- Score
 	$categories = [];
 	$score = 0;
+	// Weights shift by site type and don't always sum to 100, so divide by
+	// the total. Otherwise a flawless portfolio tops out at 95 and a store can pass 100.
+	$totalWeight = array_sum(array_column($cats, 'weight'));
 	foreach ($cats as $key => $c) {
 		$pct = max(0, 100 - min(100, $c['lost'] * 100 / max(1, $c['max'])));
-		$earned = $c['weight'] * $pct / 100;
+		$earned = $c['weight'] * $pct / $totalWeight;
 		$score += $earned;
 		usort($c['findings'], function ($a, $b) {
 			$rank = ['bad' => 0, 'warn' => 1, 'good' => 2];
